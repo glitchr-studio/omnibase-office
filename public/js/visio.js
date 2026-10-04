@@ -9,7 +9,9 @@
  * The host offers, the guest answers. Whoever comes in says "hello": the
  * host answers a guest's hello with an offer, the guest answers a host's
  * hello with its own - so the order they arrive in does not matter, and a
- * page reloaded starts the handshake again from scratch.
+ * page reloaded starts the handshake again from scratch. Each offer gets a
+ * fresh connection on both sides; hellos that cross within three seconds
+ * make one offer, not two.
  */
 (function () {
     'use strict';
@@ -29,7 +31,7 @@
 
         var pc = null, channel = null, localStream = null, screenStream = null;
         var after = 0, joined = false, connected = false, over = false, timer = null, pending = [];
-        var iceServers = [];
+        var iceServers = [], offeredAt = 0;
 
         function status(key) {
             root.dataset.visioState = key;
@@ -122,6 +124,7 @@
                 bindChannel(pc.createDataChannel('chat'));
             }
             status('connecting');
+            offeredAt = Date.now();
             return pc.createOffer(restart ? { iceRestart: true } : undefined)
                 .then(function (description) { return pc.setLocalDescription(description); })
                 .then(function () { return send('offer', pc.localDescription.toJSON()); });
@@ -130,20 +133,23 @@
         function handle(signal) {
             var payload = signal.payload;
             if (signal.type === 'hello') {
-                if (isHost) return offer(false);
-                if (!connected) return send('hello');
-                return null;
+                // The guest is there (or back): the host offers - once, even if two hellos cross.
+                if (isHost) return pc && !connected && Date.now() - offeredAt < 3000 ? null : offer(false);
+                // The host is there (or back) and has not offered yet: say hello again, it answers with its offer.
+                return Date.now() - offeredAt < 3000 ? null : send('hello');
             }
             if (signal.type === 'offer' && !isHost) {
-                if (!pc || pc.signalingState !== 'stable' || connected === false) newPeer();
+                offeredAt = Date.now();
+                newPeer();
                 status('connecting');
+                var answering = pc;
                 return pc.setRemoteDescription(payload)
                     .then(function () { return flush(); })
-                    .then(function () { return pc.createAnswer(); })
-                    .then(function (description) { return pc.setLocalDescription(description); })
-                    .then(function () { return send('answer', pc.localDescription.toJSON()); });
+                    .then(function () { return answering.createAnswer(); })
+                    .then(function (description) { return answering.setLocalDescription(description); })
+                    .then(function () { if (pc === answering) return send('answer', answering.localDescription.toJSON()); });
             }
-            if (signal.type === 'answer' && isHost && pc) {
+            if (signal.type === 'answer' && isHost && pc && pc.signalingState === 'have-local-offer') {
                 return pc.setRemoteDescription(payload).then(flush);
             }
             if (signal.type === 'candidate' && payload) {
