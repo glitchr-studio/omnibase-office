@@ -1,0 +1,26 @@
+{# A member's page (Base\Office\Controller\Client\OfficeController::member). #}
+{% extends office_layout() %}
+
+{% block title %}{{ member.displayName }}{% endblock %}
+{% block description %}{{ member.title }}{% endblock %}
+
+{% block content %}
+<article class="of-page of-member">
+    <p class="of-back"><a href="{{ path('office_team') }}">← {{ 'team.title'|trans({}, 'office') }}</a></p>
+    <header class="of-member-head">
+        {% if member.portrait %}
+        <img class="of-portrait of-portrait-large" src="{{ member.portrait|picture(480) }}" alt="" width="160" height="160">
+        {% else %}
+        <span class="of-portrait of-portrait-large of-portrait-initials" aria-hidden="true">{{ member.initials }}</span>
+        {% endif %}
+        <div>
+            <h1>{{ member.displayName }}</h1>
+            {% if member.title %}<p class="of-lead">{{ member.title }}</p>{% endif %}
+            {% if member.languages|length > 1 %}<p class="of-meta">{{ 'team.languages'|trans({}, 'office') }} : {{ member.languages|map(l => l|language_name)|join(', ') }}</p>{% endif %}
+            {% if member.bookable %}<p><a class="of-button" href="{{ path('office_booking_member', {slug: member.slug}) }}">{{ 'booking.cta'|trans({}, 'office') }}</a></p>{% endif %}
+        </div>
+    </header>
+    {% block member_details %}{% endblock %}
+    {% if member.biography %}<div class="of-prose">{{ member.biography|nl2br }}</div>{% endif %}
+</article>
+{% endblock %}

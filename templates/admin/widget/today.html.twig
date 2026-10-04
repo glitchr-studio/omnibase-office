@@ -1,0 +1,16 @@
+{# Today's appointments (Base\Office\Admin\Widget\TodayWidgetType). #}
+<div class="analytics-card card office-widget">
+    <div class="analytics-card-header"><h2 class="analytics-card-title">{{ widget.label|trans({}, 'admin') }}</h2></div>
+    <div class="office-widget-body">
+        {% if appointments %}
+        <ul>
+            {% for a in appointments %}
+            <li class="is-{{ a.status.value }}"><b>{{ a.startsAt|date('H:i', office_timezone()) }}</b> {{ a.clientName ?? '—' }}<br><small>{{ a.type.name }}{% if not mine %} · {{ a.member.displayName }}{% endif %} · {{ a.status.label|trans({}, 'office') }}</small></li>
+            {% endfor %}
+        </ul>
+        {% else %}<p class="office-widget-empty">{{ 'admin.widget.today_none'|trans({}, 'office') }}</p>{% endif %}
+        {% if requests %}<p><a href="{{ path('office_admin_agenda') }}">{{ 'admin.agenda.requests'|trans({count: requests|length}, 'office') }}</a></p>{% endif %}
+        <p><a class="btn btn-sm" href="{{ path('office_admin_agenda') }}">{{ 'admin.agenda.title'|trans({}, 'office') }}</a></p>
+    </div>
+</div>
+{% include '@Office/admin/widget/_style.html.twig' %}

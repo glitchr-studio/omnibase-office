@@ -1,0 +1,21 @@
+{# The list of documents, and the deposit form. #}
+{% if documents %}
+<ul class="of-documents">
+    {% for document in documents %}
+    <li class="of-document{{ document.read or (document.sender and document.sender.id == app.user.id) ? '' : ' is-new' }}">
+        <div>
+            <strong>{{ document|office_document_title }}</strong>{% if not document.read and not (document.sender and document.sender.id == app.user.id) %} <span class="of-badge">{{ 'share.new'|trans({}, 'office') }}</span>{% endif %}<br>
+            <span class="of-meta">{{ document.kind.label|trans({}, 'office') }} · {{ document.createdAt|format_datetime('medium', 'short', locale=app.request.locale, timezone=office_timezone()) }} · {{ (document.size / 1024)|round(0, 'ceil') }} ko{% if document.sender and document.sender.id != app.user.id %} · {{ 'share.from'|trans({name: office_person(document.sender)}, 'office') }}{% elseif document.sender %} · {{ 'share.deposited_by_you'|trans({}, 'office') }}{% endif %}{% if document.expiresAt %} · {{ 'share.expires'|trans({date: document.expiresAt|format_datetime('medium', 'none', locale=app.request.locale)}, 'office') }}{% endif %}</span>
+        </div>
+        <div class="of-actions">
+            {% if document.available %}<a class="of-button of-button-small" href="{{ path('office_document_download', {id: document.id}) }}" data-turbo="false" data-transparent="false" download>{{ 'share.download'|trans({}, 'office') }}</a>{% else %}<span class="of-meta">{{ 'share.gone'|trans({}, 'office') }}</span>{% endif %}
+            {% if is_granted('OFFICE_DOCUMENT_REVOKE', document) %}
+            <form method="post" action="{{ path('office_document_revoke', {id: document.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('office_revoke_' ~ document.id) }}"><button type="submit" class="of-button of-button-small of-button-quiet">{{ 'share.revoke'|trans({}, 'office') }}</button></form>
+            {% endif %}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="of-empty">{{ 'share.none'|trans({}, 'office') }}</p>
+{% endif %}

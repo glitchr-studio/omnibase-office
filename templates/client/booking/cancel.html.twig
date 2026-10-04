@@ -1,0 +1,25 @@
+{# Cancelling from the e-mail's link: the date and with whom, nothing else. #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'booking.cancel.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking of-narrow">
+    <header class="of-page-head"><h1>{{ 'booking.cancel.title'|trans({}, 'office') }}</h1></header>
+    {% if cancelled or appointment.cancelled %}
+    <p class="of-success" role="status">{{ 'booking.cancel.done'|trans({}, 'office') }}</p>
+    <p><a class="of-button" href="{{ path('office_booking') }}">{{ 'booking.cancel.again'|trans({}, 'office') }}</a></p>
+    {% elseif not appointment.active %}
+    <p class="of-notice">{{ 'booking.error.not_active'|trans({}, 'office') }}</p>
+    {% else %}
+    <dl class="of-summary">
+        {% if appointment.startsAt %}<div><dt>{{ 'booking.summary.when'|trans({}, 'office') }}</dt><dd>{{ appointment.startsAt|format_datetime('full', 'short', locale=app.request.locale, timezone=office_timezone()) }}</dd></div>{% endif %}
+        <div><dt>{{ 'booking.summary.who'|trans({}, 'office') }}</dt><dd>{{ appointment.member.displayName }}</dd></div>
+    </dl>
+    <form method="post" class="of-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('office_cancel') }}">
+        <button type="submit" class="of-button of-button-danger">{{ 'booking.cancel.submit'|trans({}, 'office') }}</button>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

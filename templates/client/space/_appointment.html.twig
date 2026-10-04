@@ -1,0 +1,19 @@
+{# One appointment in the client's list. #}
+<li class="of-appointment is-{{ appointment.status.value }}">
+    <div>
+        <strong>{% if appointment.startsAt %}{{ appointment.startsAt|format_datetime('full', 'short', locale=app.request.locale, timezone=office_timezone()) }}{% else %}{{ 'booking.to_be_fixed'|trans({}, 'office') }}{% endif %}</strong><br>
+        {{ appointment.type.name }} · {{ appointment.member.displayName }}{% if appointment.beneficiary %} · {{ 'booking.for'|trans({}, 'office') }} {{ appointment.beneficiary }}{% endif %}<br>
+        <span class="of-meta">{{ appointment.channel.label|trans({}, 'office') }}{% if appointment.office %} · {{ appointment.office.name }}{% endif %}{% if appointment.address %} · {{ appointment.address }}{% endif %} · <span class="of-status">{{ appointment.status.label|trans({}, 'office') }}</span></span>
+    </div>
+    {% if actions|default(false) and appointment.active %}
+    <div class="of-actions">
+        {% set room = office_room(appointment) %}
+        {% if room %}<a class="of-button of-button-small" href="{{ path('office_visio_room', {token: room.token}) }}">{{ 'visio.join'|trans({}, 'office') }}</a>{% endif %}
+        {% if appointment.startsAt %}<a class="of-button of-button-small of-button-quiet" href="{{ path('office_booking_ics', {id: appointment.id}) }}">{{ 'booking.done.ics'|trans({}, 'office') }}</a>{% endif %}
+        <form method="post" action="{{ path('office_space_cancel', {id: appointment.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('office_cancel_' ~ appointment.id) }}">
+            <button type="submit" class="of-button of-button-small of-button-danger">{{ 'booking.cancel.short'|trans({}, 'office') }}</button>
+        </form>
+    </div>
+    {% endif %}
+</li>

@@ -1,0 +1,24 @@
+{# A type in request mode: the client asks, the office fixes the time. #}
+{% extends office_layout() %}
+
+{% block title %}{{ type.name }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking of-narrow">
+    <header class="of-page-head">
+        <p class="of-back"><a href="{{ path('office_booking_member', {slug: member.slug}) }}">← {{ member.displayName }}</a></p>
+        <h1>{{ type.name }}</h1>
+        <p class="of-lead">{{ 'booking.request.lead'|trans({}, 'office') }}</p>
+    </header>
+    {% if type.instructions %}<p class="of-notice">{{ type.instructions|nl2br }}</p>{% endif %}
+    {% if app.user %}
+    <form method="post" class="of-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('office_request') }}">
+        {% include '@Office/client/booking/_fields.html.twig' %}
+        <button type="submit" class="of-button">{{ 'booking.request.submit'|trans({}, 'office') }}</button>
+    </form>
+    {% else %}
+    <p><a class="of-button" href="{{ path('security_login', {_target_path: app.request.uri}) }}">{{ 'booking.sign_in'|trans({}, 'office') }}</a></p>
+    {% endif %}
+</section>
+{% endblock %}

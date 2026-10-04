@@ -1,0 +1,41 @@
+{# Hours and access (Base\Office\Controller\Client\OfficeController::hours): omnibase's opening hours, the walk-in hours, each office's address and access. #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'hours.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-hours">
+    <header class="of-page-head"><h1>{{ 'hours.title'|trans({}, 'office') }}</h1></header>
+
+    <div class="of-columns">
+        <section aria-labelledby="of-hours-week">
+            <h2 id="of-hours-week">{{ 'hours.week'|trans({}, 'office') }}</h2>
+            {% include '@Office/client/_hours.html.twig' %}
+            {% if walk_ins %}
+            <h3>{{ 'hours.walk_in'|trans({}, 'office') }}</h3>
+            <ul class="of-list">
+                {% for walk in walk_ins %}
+                <li><strong>{{ walk.label }}</strong><br>{{ walk.days|map(d => ('day.' ~ d)|trans({}, 'office'))|join(', ') }} · {{ walk.opensAt }}–{{ walk.closesAt }}{% if walk.notes %}<br><span class="of-meta">{{ walk.notes }}</span>{% endif %}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </section>
+
+        {% for office in offices %}
+        <section aria-labelledby="of-office-{{ office.id }}">
+            <h2 id="of-office-{{ office.id }}">{{ office.name }}</h2>
+            <address class="of-address">{{ office.street }}<br>{{ office.postalCode }} {{ office.city }}</address>
+            <ul class="of-list">
+                {% if office.phone %}<li><a href="tel:{{ office.phone|replace({' ': ''}) }}">{{ office.phone }}</a></li>{% endif %}
+                {% if office.secondaryPhone %}<li>{{ office.secondaryPhoneLabel }} <a href="tel:{{ office.secondaryPhone|replace({' ': ''}) }}">{{ office.secondaryPhone }}</a></li>{% endif %}
+                {% if office.mapUrl %}<li><a href="{{ office.mapUrl }}" rel="noopener" target="_blank">{{ 'hours.map'|trans({}, 'office') }}</a></li>{% endif %}
+            </ul>
+            {% if office.access %}<h3>{{ 'hours.access'|trans({}, 'office') }}</h3><p>{{ office.access|nl2br }}</p>{% endif %}
+            <h3>{{ 'hours.accessibility'|trans({}, 'office') }}</h3>
+            <p>{{ (office.wheelchairAccessible ? 'hours.wheelchair_yes' : 'hours.wheelchair_no')|trans({}, 'office') }}{% if office.accessibility %} {{ office.accessibility }}{% endif %}</p>
+            {% if office.parking %}<h3>{{ 'hours.parking'|trans({}, 'office') }}</h3><p>{{ office.parking|nl2br }}</p>{% endif %}
+        </section>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

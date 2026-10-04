@@ -1,0 +1,8 @@
+{# "A document awaits": neither the document, nor its title, nor a link that opens it without signing in. #}
+{% extends '@Office/email/_layout.html.twig' %}
+{% block body %}
+<p>{{ 'share.email.hello'|trans({}, 'office') }}</p>
+<p>{{ 'share.email.body'|trans({}, 'office') }}</p>
+<p><a href="{{ space_url }}" style="display:inline-block;padding:12px 20px;background:#1f5f4a;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">{{ 'share.email.button'|trans({}, 'office') }}</a></p>
+<p style="font-size:14px;color:#5a6660;">{{ 'share.email.why'|trans({}, 'office') }}</p>
+{% endblock %}

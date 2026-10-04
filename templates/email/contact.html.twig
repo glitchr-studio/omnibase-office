@@ -1,0 +1,6 @@
+{# A contact request, to the office. #}
+{% extends '@Office/email/_layout.html.twig' %}
+{% block body %}
+<p><strong>{{ contact.name }}</strong> &lt;{{ contact.email }}&gt;{% if contact.phone %} · {{ contact.phone }}{% endif %}</p>
+<p>{{ contact.message|nl2br }}</p>
+{% endblock %}

@@ -1,0 +1,16 @@
+{# The compliance checks (Base\Office\Admin\Widget\ComplianceWidgetType). #}
+<div class="analytics-card card office-widget">
+    <div class="analytics-card-header"><h2 class="analytics-card-title">{{ widget.label|trans({}, 'admin') }}</h2></div>
+    <div class="office-widget-body">
+        <ul>
+            {% for result in results %}
+            <li class="office-check is-{{ result.status }}">
+                <i class="fa-solid {{ result.status == 'ok' ? 'fa-circle-check' : (result.status == 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-xmark') }}" aria-hidden="true"></i>
+                <span>{{ result.label|trans(result.parameters, result.domain) }}<span class="visually-hidden"> — {{ ('compliance.status.' ~ result.status)|trans({}, 'office') }}</span></span>
+                {% if result.advice %}<small>{{ result.advice|trans(result.parameters, result.domain) }}</small>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% include '@Office/admin/widget/_style.html.twig' %}

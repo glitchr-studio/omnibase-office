@@ -1,0 +1,49 @@
+{
+    "name": "omnibase/office",
+    "type": "symfony-bundle",
+    "description": "A professional practice on omnibase - the office, its team, its hours and contact (core), appointments by slot or by request (Booking), an encrypted document vault per recipient with its access log (Share), one-to-one peer-to-peer video with a waiting room (Visio). Shared by the regulated professions: health, notaries, lawyers.",
+    "keywords": ["symfony", "omnibase", "office", "appointments", "booking", "documents", "encryption", "webrtc", "teleconsultation"],
+    "homepage": "https://github.com/glitchr-studio/omnibase-office",
+    "license": "LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Marco Meyer",
+            "email": "marco.meyer@glitchr.io"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-sodium": "*",
+        "doctrine/orm": "^2.15|^3.0",
+        "glitchr/omnibase": "3.0.*-dev",
+        "league/flysystem": "^3.0",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/console": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/form": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/lock": "^6.4|^7.0|^8.0",
+        "symfony/mailer": "^6.4|^7.0|^8.0",
+        "symfony/security-bundle": "^6.4|^7.0|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5|^11.0|^12.0"
+    },
+    "suggest": {
+        "omnibase/admin": "The back office: the agenda per member, the CRUD screens, the dashboard widgets, the access log",
+        "glitchr/omnistate": "A member read from their professional register (RPPS, later the CNB) through ProfessionalRegistryInterface",
+        "omnibase/mailbox": "Messages to the office, with attachments kept in the vault"
+    },
+    "autoload": {
+        "psr-4": {
+            "Base\\Office\\": "./src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Base\\Office\\Tests\\": "./tests"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

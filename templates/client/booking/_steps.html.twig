@@ -1,0 +1,6 @@
+{# Where the client is in the booking: who, what for, when, confirm. #}
+<ol class="of-steps" aria-label="{{ 'booking.steps.label'|trans({}, 'office') }}">
+    {% for key in ['who', 'what', 'when', 'confirm'] %}
+    <li{% if loop.index == step %} aria-current="step"{% endif %} class="{{ loop.index < step ? 'is-done' }}">{{ ('booking.steps.' ~ key)|trans({}, 'office') }}</li>
+    {% endfor %}
+</ol>

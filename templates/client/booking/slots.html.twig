@@ -1,0 +1,41 @@
+{# Booking, step 3: when - a week of free slots, a day a column (a list on a phone). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'booking.title'|trans({}, 'office') }} — {{ type.name }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking">
+    <header class="of-page-head">
+        <p class="of-back"><a href="{{ path('office_booking_member', {slug: member.slug}) }}">← {{ member.displayName }}</a></p>
+        <h1>{{ type.name }}</h1>
+        <p class="of-lead">{{ member.displayName }} · {{ type.channel.label|trans({}, 'office') }} · {{ 'booking.minutes'|trans({minutes: type.duration}, 'office') }}</p>
+        {% include '@Office/client/booking/_steps.html.twig' with {step: 3} only %}
+    </header>
+
+    <nav class="of-week-nav" aria-label="{{ 'booking.week_nav'|trans({}, 'office') }}">
+        {% if week > 0 %}<a class="of-button of-button-quiet" rel="prev" href="{{ path('office_booking_slots', {slug: member.slug, type: type.slug, semaine: week - 1}) }}">← {{ 'booking.week_previous'|trans({}, 'office') }}</a>{% else %}<span></span>{% endif %}
+        {% if week < last_week %}<a class="of-button of-button-quiet" rel="next" href="{{ path('office_booking_slots', {slug: member.slug, type: type.slug, semaine: week + 1}) }}">{{ 'booking.week_next'|trans({}, 'office') }} →</a>{% endif %}
+    </nav>
+
+    {% if next %}
+    <p class="of-notice">{{ 'booking.no_slot_week'|trans({}, 'office') }} <a href="{{ path('office_booking_confirm', {slug: member.slug, type: type.slug, start: next.key}) }}">{{ 'booking.next_slot'|trans({date: next.start|format_datetime('full', 'short', locale=app.request.locale, timezone=office_timezone())}, 'office') }}</a></p>
+    {% endif %}
+
+    <div class="of-slot-days">
+        {% for day in days %}
+        <section class="of-slot-day{{ day.slots ? '' : ' is-empty' }}" aria-labelledby="of-day-{{ loop.index }}">
+            <h2 id="of-day-{{ loop.index }}">{{ day.date|format_datetime(pattern='EEEE d MMMM', locale=app.request.locale, timezone=office_timezone()) }}</h2>
+            {% if day.slots %}
+            <ul class="of-slots">
+                {% for slot in day.slots %}
+                <li><a class="of-slot" href="{{ path('office_booking_confirm', {slug: member.slug, type: type.slug, start: slot.key}) }}">{{ slot.start|date('H:i', office_timezone()) }}</a></li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="of-meta">{{ 'booking.no_slot_day'|trans({}, 'office') }}</p>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

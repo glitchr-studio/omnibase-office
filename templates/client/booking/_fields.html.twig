@@ -1,0 +1,25 @@
+{# What the client adds: who it is for, a phone, the address of a home visit, the reason (kept encrypted). #}
+{% if beneficiaries %}
+<div class="of-field">
+    <label for="of-beneficiary">{{ 'booking.for'|trans({}, 'office') }}</label>
+    <select id="of-beneficiary" name="beneficiary">
+        <option value="">{{ 'booking.for_me'|trans({}, 'office') }}</option>
+        {% for key, choice in beneficiaries %}<option value="{{ key }}">{{ choice.label }}</option>{% endfor %}
+    </select>
+</div>
+{% endif %}
+{% if type.channel.value == 'home' %}
+<div class="of-field">
+    <label for="of-address">{{ 'booking.address'|trans({}, 'office') }}</label>
+    <input id="of-address" name="address" type="text" autocomplete="street-address" required>
+</div>
+{% endif %}
+<div class="of-field">
+    <label for="of-phone">{{ 'booking.phone'|trans({}, 'office') }}</label>
+    <input id="of-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel">
+</div>
+<div class="of-field">
+    <label for="of-reason">{{ 'booking.reason'|trans({}, 'office') }}</label>
+    <textarea id="of-reason" name="reason" rows="3" maxlength="2000" aria-describedby="of-reason-help"></textarea>
+    <p id="of-reason-help" class="of-help">{{ 'booking.reason_help'|trans({}, 'office') }}</p>
+</div>

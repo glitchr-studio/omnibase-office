@@ -1,0 +1,22 @@
+{# The invitation accepted: an identifier, a password. #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'invitation.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-narrow">
+    <header class="of-page-head"><h1>{{ 'invitation.title'|trans({}, 'office') }}</h1></header>
+    {% if not invitation %}
+    <p class="of-notice">{{ 'invitation.gone'|trans({}, 'office') }}</p>
+    {% else %}
+    <p class="of-lead">{{ 'invitation.lead'|trans({name: invitation.name, email: invitation.email}, 'office') }}</p>
+    {% for error in errors %}<p class="of-warning" role="alert">{{ error }}</p>{% endfor %}
+    <form method="post" class="of-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('office_invitation') }}">
+        <div class="of-field"><label for="of-inv-user">{{ 'invitation.username'|trans({}, 'office') }}</label><input id="of-inv-user" name="username" type="text" autocomplete="username" required minlength="3" maxlength="40" pattern="[A-Za-z0-9._\-]+" value="{{ app.request.request.get('username') }}"></div>
+        <div class="of-field"><label for="of-inv-pass">{{ 'invitation.password'|trans({}, 'office') }}</label><input id="of-inv-pass" name="password" type="password" autocomplete="new-password" required minlength="10" aria-describedby="of-inv-help" style="min-height:2.75rem;padding:.5rem .7rem;border:1px solid;border-radius:.6rem;font:inherit"><p id="of-inv-help" class="of-help">{{ 'invitation.password_help'|trans({}, 'office') }}</p></div>
+        <button type="submit" class="of-button">{{ 'invitation.submit'|trans({}, 'office') }}</button>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{# Video rooms whose guest waits (Base\Office\Admin\Widget\WaitingRoomWidgetType). #}
+<div class="analytics-card card office-widget">
+    <div class="analytics-card-header"><h2 class="analytics-card-title">{{ widget.label|trans({}, 'admin') }}</h2></div>
+    <div class="office-widget-body">
+        {% if rooms %}
+        <ul>
+            {% for room in rooms %}
+            <li><b>{{ room.guest }}</b> — {{ 'admin.widget.waiting_since'|trans({time: room.guestWaitingSince|date('H:i', office_timezone())}, 'office') }}{% if room.host and app.user and room.host.id == app.user.id %}<br><a class="btn btn-primary btn-sm" href="{{ path('office_visio_room', {token: room.token}) }}" target="_top">{{ 'visio.join'|trans({}, 'office') }}</a>{% else %}<br><small>{{ room.host }}</small>{% endif %}</li>
+            {% endfor %}
+        </ul>
+        {% else %}<p class="office-widget-empty">{{ 'admin.widget.waiting_none'|trans({}, 'office') }}</p>{% endif %}
+        {% block waiting_notice %}{% endblock %}
+    </div>
+</div>
+{% include '@Office/admin/widget/_style.html.twig' %}

@@ -1,0 +1,35 @@
+{# Who did what with which document (Base\Office\Controller\Admin\DocumentsController::log): the coordination's screen. #}
+{% extends '@Admin/layout.html.twig' %}
+
+{% block page_title %}{{ 'admin.log.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content_header %}
+<div class="admin-header">
+    <span class="admin-header-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+    <div class="admin-header-titles">
+        <h1>{{ 'admin.log.title'|trans({}, 'office') }}{% if document %} — #{{ document }}{% endif %}</h1>
+        <div class="admin-header-subtitle">{{ 'admin.log.lead'|trans({}, 'office') }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="padding:1rem 1.1rem;max-width:72rem">
+    <table style="width:100%;font-size:.88rem">
+        <thead><tr><th>{{ 'admin.log.when'|trans({}, 'office') }}</th><th>{{ 'admin.log.who'|trans({}, 'office') }}</th><th>{{ 'admin.log.what'|trans({}, 'office') }}</th><th>{{ 'admin.log.document'|trans({}, 'office') }}</th><th>{{ 'admin.log.ip'|trans({}, 'office') }}</th></tr></thead>
+        <tbody>
+        {% for log in logs %}
+        <tr style="border-bottom:1px solid rgba(127,127,127,.25)">
+            <td style="padding:.4rem .5rem">{{ log.createdAt|format_datetime('short', 'medium') }}</td>
+            <td style="padding:.4rem .5rem">{{ log.userLabel ?? '—' }}</td>
+            <td style="padding:.4rem .5rem">{{ log.action.label|trans({}, 'office') }}</td>
+            <td style="padding:.4rem .5rem"><a href="{{ path('office_admin_access_log', {document: log.documentId}) }}">#{{ log.documentId }}</a></td>
+            <td style="padding:.4rem .5rem">{{ log.ip }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" style="padding:.6rem;opacity:.65">{{ 'admin.log.none'|trans({}, 'office') }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

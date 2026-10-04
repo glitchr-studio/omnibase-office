@@ -1,0 +1,15 @@
+{# The week as omnibase's opening hours summarise it (days in a row with the same hours together), the days off announced. #}
+{% set hours = opening_hours() %}
+<dl class="of-hours-list">
+    {% for line in hours.summary() %}
+    <div>
+        <dt>{{ ('day.' ~ line.from)|trans({}, 'office') }}{% if line.until != line.from %} – {{ ('day.' ~ line.until)|trans({}, 'office') }}{% endif %}</dt>
+        <dd>{% for slot in line.slots %}{{ slot[0] }}–{{ slot[1] }}{{ not loop.last ? ', ' }}{% endfor %}</dd>
+    </div>
+    {% else %}
+    <div><dt>{{ 'hours.none'|trans({}, 'office') }}</dt><dd></dd></div>
+    {% endfor %}
+</dl>
+{% for special in hours.notices() %}
+<p class="of-notice">{{ (special.closed ? 'hours.special_closed' : 'hours.special_open')|trans({from: special.from|date('d/m'), until: special.until|date('d/m'), one: special.oneDay ? 'yes' : 'no'}, 'office') }}{% if special.reason %} — {{ special.reason }}{% endif %}</p>
+{% endfor %}

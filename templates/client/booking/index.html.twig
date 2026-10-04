@@ -1,0 +1,29 @@
+{# Booking, step 1: with whom (Base\Office\Controller\Client\BookingController::index). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'booking.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking">
+    <header class="of-page-head">
+        <h1>{{ 'booking.title'|trans({}, 'office') }}</h1>
+        {% include '@Office/client/booking/_steps.html.twig' with {step: 1} only %}
+    </header>
+    {% block booking_before %}{% endblock %}
+    {% for category, list in groups %}
+    <section class="of-team-group">
+        {% if category %}<h2>{{ category }}</h2>{% endif %}
+        <ul class="of-choices">
+            {% for member in list %}
+            <li><a class="of-choice" href="{{ path('office_booking_member', {slug: member.slug}) }}">
+                {% if member.portrait %}<img class="of-portrait" src="{{ member.portrait|picture(160) }}" alt="" width="56" height="56" loading="lazy">{% else %}<span class="of-portrait of-portrait-initials" aria-hidden="true">{{ member.initials }}</span>{% endif %}
+                <span><strong>{{ member.displayName }}</strong>{% if member.title %}<br><span class="of-meta">{{ member.title }}</span>{% endif %}</span>
+            </a></li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% else %}
+    <p class="of-empty">{{ 'booking.none'|trans({}, 'office') }}</p>
+    {% endfor %}
+</section>
+{% endblock %}

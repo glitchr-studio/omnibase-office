@@ -1,0 +1,25 @@
+{# Booking, step 2: what for. #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'booking.title'|trans({}, 'office') }} — {{ member.displayName }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking">
+    <header class="of-page-head">
+        <p class="of-back"><a href="{{ path('office_booking') }}">← {{ 'booking.back_who'|trans({}, 'office') }}</a></p>
+        <h1>{{ member.displayName }}</h1>
+        {% if member.title %}<p class="of-lead">{{ member.title }}</p>{% endif %}
+        {% include '@Office/client/booking/_steps.html.twig' with {step: 2} only %}
+    </header>
+    <ul class="of-choices">
+        {% for type in types %}
+        <li><a class="of-choice" href="{{ path('office_booking_slots', {slug: member.slug, type: type.slug}) }}">
+            <span>
+                <strong>{{ type.name }}</strong><br>
+                <span class="of-meta">{{ type.channel.label|trans({}, 'office') }} · {{ 'booking.minutes'|trans({minutes: type.duration}, 'office') }}{% if type.price %} · {{ type.price }}{% endif %}{% if type.request %} · {{ 'mode.request'|trans({}, 'office') }}{% endif %}</span>
+            </span>
+        </a></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{# Booked (or asked): when, with whom, the calendar links. #}
+{% extends office_layout() %}
+
+{% block title %}{{ ('booking.done.title_' ~ appointment.status.value)|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking of-narrow">
+    <header class="of-page-head">
+        <h1>{{ ('booking.done.title_' ~ appointment.status.value)|trans({}, 'office') }}</h1>
+    </header>
+    <dl class="of-summary">
+        {% if appointment.startsAt %}<div><dt>{{ 'booking.summary.when'|trans({}, 'office') }}</dt><dd>{{ appointment.startsAt|format_datetime('full', 'short', locale=app.request.locale, timezone=office_timezone()) }}</dd></div>{% endif %}
+        <div><dt>{{ 'booking.summary.who'|trans({}, 'office') }}</dt><dd>{{ appointment.member.displayName }}</dd></div>
+        <div><dt>{{ 'booking.summary.what'|trans({}, 'office') }}</dt><dd>{{ appointment.type.name }} · {{ appointment.channel.label|trans({}, 'office') }}</dd></div>
+        {% if appointment.beneficiary %}<div><dt>{{ 'booking.for'|trans({}, 'office') }}</dt><dd>{{ appointment.beneficiary }}</dd></div>{% endif %}
+        {% if appointment.office %}<div><dt>{{ 'booking.summary.where'|trans({}, 'office') }}</dt><dd>{{ appointment.office.name }}, {{ appointment.office.address }}</dd></div>{% endif %}
+        {% if appointment.address %}<div><dt>{{ 'booking.summary.where'|trans({}, 'office') }}</dt><dd>{{ appointment.address }}</dd></div>{% endif %}
+    </dl>
+    {% if appointment.type.instructions %}<p class="of-notice">{{ appointment.type.instructions|nl2br }}</p>{% endif %}
+    <p class="of-meta">{{ 'booking.done.mail'|trans({}, 'office') }}</p>
+    <p class="of-actions">
+        {% if appointment.startsAt %}
+        <a class="of-button of-button-quiet" href="{{ path('office_booking_ics', {id: appointment.id}) }}">{{ 'booking.done.ics'|trans({}, 'office') }}</a>
+        {% if google %}<a class="of-button of-button-quiet" href="{{ google }}" rel="noopener" target="_blank">{{ 'booking.done.google'|trans({}, 'office') }}</a>{% endif %}
+        {% endif %}
+        <a class="of-button" href="{{ path('office_space_appointments') }}">{{ 'booking.done.space'|trans({}, 'office') }}</a>
+    </p>
+</section>
+{% endblock %}

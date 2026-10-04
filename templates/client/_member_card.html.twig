@@ -1,0 +1,13 @@
+{# One member as a card: portrait or initials, name, title, the booking button when they take appointments online. #}
+<article class="of-card of-member-card">
+    <a class="of-member-link" href="{{ path('office_member', {slug: member.slug}) }}">
+        {% if member.portrait %}
+        <img class="of-portrait" src="{{ member.portrait|picture(240) }}" alt="" width="96" height="96" loading="lazy">
+        {% else %}
+        <span class="of-portrait of-portrait-initials" aria-hidden="true"{% if member.color %} style="--of-member: {{ member.color }}"{% endif %}>{{ member.initials }}</span>
+        {% endif %}
+        <span class="of-member-name">{{ member.displayName }}</span>
+        {% if member.title %}<span class="of-member-title">{{ member.title }}</span>{% endif %}
+    </a>
+    {% if member.bookable %}<a class="of-button of-button-small" href="{{ path('office_booking_member', {slug: member.slug}) }}">{{ 'booking.cta'|trans({}, 'office') }}<span class="of-sr"> — {{ member.displayName }}</span></a>{% endif %}
+</article>

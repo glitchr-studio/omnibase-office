@@ -1,0 +1,437 @@
+day:
+    1: lundi
+    2: mardi
+    3: mercredi
+    4: jeudi
+    5: vendredi
+    6: samedi
+    7: dimanche
+
+channel:
+    in_person: Au cabinet
+    video: En visio
+    home: À domicile
+    phone: Par téléphone
+
+mode:
+    slots: Sur créneau
+    request: Sur demande
+
+bookable_by:
+    everyone: Tout le monde
+    known: Personnes déjà reçues
+    staff: Le cabinet seulement
+
+status:
+    requested: En attente de confirmation
+    confirmed: Confirmé
+    cancelled: Annulé
+    no_show: Absence
+    done: Honoré
+
+source:
+    online: En ligne
+    phone: Par téléphone
+    staff: Au cabinet
+
+kind:
+    result: Résultat
+    prescription: Ordonnance
+    report: Compte rendu
+    letter: Courrier
+    upload: Document déposé
+    other: Autre document
+
+access:
+    view: Affichage
+    download: Téléchargement
+    upload: Dépôt
+    revoke: Retrait
+    share: Envoi
+    denied: Accès refusé
+
+team:
+    title: L’équipe
+    lead: Les professionnels qui vous reçoivent.
+    empty: L’équipe sera présentée ici prochainement.
+    languages: Langues parlées
+
+hours:
+    title: Horaires et accès
+    week: Horaires d’ouverture
+    none: Horaires à venir
+    walk_in: Sans rendez-vous
+    special_closed: '{one, select, yes {Fermé le {from}} other {Fermé du {from} au {until}}}'
+    special_open: '{one, select, yes {Horaires particuliers le {from}} other {Horaires particuliers du {from} au {until}}}'
+    map: Voir sur la carte
+    access: Venir
+    accessibility: Accessibilité
+    wheelchair_yes: Accessible aux personnes à mobilité réduite.
+    wheelchair_no: L’accès n’est pas de plain-pied — appelez-nous, nous trouverons une solution.
+    parking: Stationnement
+
+contact:
+    title: Nous écrire
+    notice: Ce formulaire n’est pas confidentiel — n’y écrivez rien de personnel ou de sensible.
+    privacy: 'Vos nom, coordonnées et message servent à vous répondre ; ils sont conservés {months} mois au plus puis supprimés.'
+    name: Nom
+    email: Adresse e-mail
+    phone: Téléphone
+    message: Votre message
+    submit: Envoyer
+    sent: Merci, votre message est parti. Nous vous répondrons dès que possible.
+
+booking:
+    cta: Prendre rendez-vous
+    title: Prendre rendez-vous
+    none: La prise de rendez-vous en ligne n’est pas ouverte pour le moment — appelez le cabinet.
+    back_who: Choisir quelqu’un d’autre
+    back_when: Choisir un autre créneau
+    minutes: '{minutes} min'
+    week_nav: Semaines
+    week_previous: Semaine précédente
+    week_next: Semaine suivante
+    no_slot_day: Aucun créneau
+    no_slot_week: Aucun créneau libre cette semaine.
+    next_slot: 'Prochain créneau : {date}'
+    to_be_fixed: Date à fixer par le cabinet
+    sign_in: Se connecter pour faire la demande
+    for: Pour
+    for_me: Moi-même
+    address: Adresse de la visite
+    phone: Téléphone où vous joindre
+    reason: Motif (facultatif)
+    reason_help: Lu uniquement par la personne qui vous reçoit ; conservé chiffré, jamais envoyé par e-mail.
+    steps:
+        label: Étapes de la prise de rendez-vous
+        who: Avec qui
+        what: Pour quoi
+        when: Quand
+        confirm: Confirmation
+    summary:
+        when: Quand
+        who: Avec
+        what: Rendez-vous
+        where: Où
+        how: Comment
+    confirm:
+        title: Confirmer le rendez-vous
+        submit: Confirmer le rendez-vous
+        ask: Envoyer la demande
+    request:
+        lead: Décrivez votre besoin, le cabinet vous propose une date.
+        submit: Envoyer la demande
+    done:
+        title_confirmed: Rendez-vous confirmé
+        title_requested: Demande envoyée
+        title_cancelled: Rendez-vous annulé
+        title_done: Rendez-vous passé
+        title_no_show: Rendez-vous passé
+        mail: Un e-mail récapitulatif vient de vous être envoyé, avec le lien pour annuler.
+        ics: Ajouter à mon agenda (.ics)
+        google: Ajouter à Google Agenda
+        space: Mes rendez-vous
+    cancel:
+        title: Annuler le rendez-vous
+        submit: Annuler ce rendez-vous
+        short: Annuler
+        done: Le rendez-vous est annulé. Merci de nous avoir prévenus.
+        again: Reprendre rendez-vous
+    flash:
+        cancelled: Le rendez-vous est annulé.
+    error:
+        slot_taken: Ce créneau vient d’être pris. Choisissez-en un autre.
+        too_late: 'Il n’est plus possible d’annuler en ligne à moins de {hours} h du rendez-vous — appelez le cabinet.'
+        not_bookable: Ce rendez-vous ne se prend pas en ligne — appelez le cabinet.
+        request_only: Ce rendez-vous se demande, il ne se réserve pas.
+        not_active: Ce rendez-vous n’est plus en cours.
+        no_time: Indiquez la date et l’heure.
+        overlap: 'Un autre rendez-vous occupe déjà ce moment ({at}).'
+        series_length: Une série compte de 1 à 120 rendez-vous.
+        outside_area: Cette adresse est hors de la zone où le cabinet se déplace.
+    email:
+        booked: { subject: 'Rendez-vous confirmé — {date}', lead: Votre rendez-vous est confirmé. }
+        requested: { subject: Votre demande de rendez-vous est bien reçue, lead: 'Votre demande est enregistrée. Le cabinet vous la confirme dès que possible.' }
+        confirmed: { subject: 'Rendez-vous confirmé — {date}', lead: Le cabinet a confirmé votre rendez-vous. }
+        moved: { subject: 'Rendez-vous déplacé — {date}', lead: 'Votre rendez-vous a été déplacé. Voici sa nouvelle date.' }
+        cancelled: { subject: Rendez-vous annulé, lead: Ce rendez-vous est annulé. }
+        reminder: { subject: 'Rappel de rendez-vous — {date}', lead: '{hours, plural, =0 {Rappel de votre rendez-vous.} one {Rappel : votre rendez-vous est dans une heure.} other {Rappel : votre rendez-vous est dans # heures.}}' }
+        series: '{count, plural, one {Un rendez-vous est prévu :} other {# rendez-vous sont prévus :}}'
+        space: Voir mes rendez-vous
+        cancel: 'Un empêchement ? Annulez ici :'
+        phone: 'Une question : {phone}.'
+
+calendar:
+    name: Mes rendez-vous
+    title: 'Rendez-vous — {office}'
+    description: 'Avec {member}. Téléphone du cabinet : {phone}.'
+
+space:
+    appointments: Mes rendez-vous
+    documents: Mes documents
+    upcoming: À venir
+    past: Passés
+    no_upcoming: Aucun rendez-vous à venir.
+
+share:
+    lead: Vos documents sont conservés chiffrés. Chaque consultation est enregistrée.
+    none: Aucun document pour le moment.
+    new: Nouveau
+    from: 'envoyé par {name}'
+    deposited_by_you: déposé par vous
+    expires: 'disponible jusqu’au {date}'
+    download: Télécharger
+    gone: Plus disponible
+    revoke: Retirer
+    deposit:
+        title: Déposer un document
+        name: Nom du document
+        kind: Nature
+        file: Fichier
+        help: 'PDF ou photo, 20 Mo au plus.'
+        submit: Déposer
+    flash:
+        deposited: Le document est déposé.
+        revoked: Le document est retiré.
+    error:
+        empty: Choisissez un fichier.
+        too_large: 'Le fichier dépasse {max} Mo.'
+        type: 'Ce type de fichier n’est pas accepté ({type}).'
+        unavailable: Le dépôt de documents est momentanément indisponible. Rien n’a été enregistré.
+    email:
+        subject: Un nouveau document vous attend
+        hello: Bonjour,
+        body: Un nouveau document vous attend dans votre espace.
+        button: Ouvrir mon espace
+        why: Pour protéger sa confidentialité, le document n’est pas joint à cet e-mail et son nom n’y figure pas. Connectez-vous pour le consulter.
+
+email:
+    footer: Message automatique — merci de ne pas y répondre. Aucune information confidentielle ne vous sera jamais demandée par e-mail.
+
+invitation:
+    title: Ouvrir mon espace
+    lead: 'Bonjour {name}. Choisissez un identifiant et un mot de passe pour {email}.'
+    gone: Ce lien n’est plus valable. Demandez-en un nouveau au cabinet.
+    username: Identifiant
+    password: Mot de passe
+    password_help: Dix caractères au moins.
+    submit: Créer mon espace
+    flash:
+        welcome: Votre espace est ouvert. Connectez-vous avec l’identifiant et le mot de passe que vous venez de choisir.
+    error:
+        username: 'L’identifiant compte 3 à 40 lettres, chiffres, points ou tirets.'
+        taken: Cet identifiant est déjà pris.
+        password: Le mot de passe compte dix caractères au moins.
+        exists: Un compte existe déjà pour cette adresse — connectez-vous.
+    email:
+        subject: Ouvrez votre espace
+        hello: 'Bonjour {name},'
+        body: 'Le cabinet vous a ouvert un espace en ligne : rendez-vous, documents, messages. Le lien ci-dessous est valable {days} jours.'
+        button: Créer mon espace
+
+visio:
+    title: Consultation en visio
+    join: Rejoindre la visio
+    with_guest: 'Avec {name}'
+    with_host: 'Avec {name}'
+    ended: La consultation est terminée.
+    early: 'La salle ouvre à {time}. Revenez à ce moment-là.'
+    closed: Cette salle est fermée.
+    noscript: La visio a besoin de JavaScript.
+    remote: Image de votre interlocuteur
+    local: Votre image
+    controls: Commandes de la visio
+    start: Démarrer la consultation
+    enter: Entrer en salle d’attente
+    mic: Couper le micro
+    camera: Couper la caméra
+    screen: Partager l’écran
+    file: Envoyer un document
+    end: Terminer
+    leave: Quitter
+    chat: Messages
+    chat_label: Votre message
+    chat_send: Envoyer
+    chat_help: Ces messages passent directement d’un navigateur à l’autre et ne sont pas conservés.
+    file_sent: Document envoyé
+    file_received: Un document a été déposé dans votre espace
+    you: Vous
+    status:
+        check: Vérification de la caméra et du micro…
+        ready: Caméra et micro prêts.
+        denied: Caméra ou micro inaccessible. Autorisez-les dans votre navigateur puis rechargez la page.
+        waiting_host: Vous êtes en salle d’attente. La consultation commence dès que votre interlocuteur arrive.
+        waiting_guest: En attente de votre interlocuteur.
+        guest_here: Votre interlocuteur est en salle d’attente — connexion…
+        connecting: Connexion…
+        connected: En ligne.
+        lost: Connexion interrompue, nouvelle tentative…
+
+compliance:
+    failed: 'Vérification impossible : {error}'
+    status: { ok: conforme, warning: à vérifier, missing: manquant }
+    vault_key: Clé de chiffrement des documents
+    vault_key_advice: 'Aucune clé SHARE_MASTER_KEY utilisable : aucun document ni motif ne peut être enregistré. bin/console secrets:set SHARE_MASTER_KEY (32 octets en base64).'
+    turn: Relais de la visio (TURN)
+    turn_advice: 'TURN_SECRET et TURN_URLS ne sont pas renseignés : la visio échouera sur les réseaux qui interdisent la liaison directe.'
+    turn_unreachable: 'Le relais ne répond pas ({url}).'
+    legal_host: Mentions légales — hébergeur et contact données
+    legal_host_advice: 'L’hébergeur n’est pas renseigné (Réglages › Cabinet).'
+    legal_dpo_advice: 'Le contact pour les données personnelles n’est pas renseigné (Réglages › Cabinet).'
+
+settings:
+    legal_host: 'Hébergeur du site (nom, adresse, téléphone)'
+    legal_dpo: Contact pour les données personnelles (e-mail)
+    legal_retention: Durées de conservation annoncées
+
+admin:
+    field:
+        name: Nom
+        main: Principal
+        street: Adresse
+        postal_code: Code postal
+        city: Commune
+        latitude: Latitude
+        longitude: Longitude
+        phone: Téléphone
+        email: E-mail
+        secondary_phone: Second téléphone
+        secondary_phone_label: Libellé du second téléphone
+        access: Accès
+        wheelchair: Accessible PMR
+        accessibility: Précisions d’accessibilité
+        parking: Stationnement
+        position: Ordre
+        display_name: Nom affiché
+        title: Titre
+        category: Rubrique
+        user: Compte
+        registry_id: Numéro au registre
+        registry_checked_at: Registre lu le
+        portrait: Portrait
+        biography: Présentation
+        offices: Lieux
+        office: Lieu
+        color: Couleur
+        visible: Visible sur le site
+        bookable: Rendez-vous en ligne
+        active: Actif
+        label: Libellé
+        days: Jours
+        day: Jour
+        opens_at: De
+        closes_at: À
+        member: Professionnel
+        members: Professionnels
+        notes: Précisions
+        created_at: Reçu le
+        message: Message
+        handled: Traité
+        duration: Durée
+        buffer: Battement
+        channel: Modalité
+        mode: Réservation
+        bookable_by: Ouvert à
+        manual_confirmation: Confirmation par le cabinet
+        price: Tarif affiché
+        instructions: Consignes
+        starts_at: Début
+        ends_at: Fin
+        types: Motifs
+        type: Motif
+        valid_from: Valable du
+        valid_until: au
+        from: Du
+        until: Au
+        absence_reason: Raison (interne)
+        postal_codes: Codes postaux
+        towns: Communes
+        radius: Rayon (km)
+        client: Personne
+        beneficiary: Pour (proche)
+        address: Adresse de visite
+        status: État
+    help:
+        category: 'Le groupe sous lequel la page Équipe la range : « Médecins », « Infirmières »…'
+        registry_id: 'RPPS pour un professionnel de santé ; relu par « Lire le registre ».'
+        minutes: En minutes.
+        price: 'Tel qu’il doit s’afficher : « 30 € ». Rien n’est payé en ligne.'
+        time: 'Au format 08:30.'
+        schedule_office: 'Aucun : visites à domicile ou rendez-vous à distance.'
+        schedule_types: 'Aucun : tous les motifs du professionnel.'
+        absence_reason: Jamais montrée aux personnes reçues.
+        list: 'Séparés par des virgules.'
+    registry:
+        action: Lire le registre
+        no_id: Aucun numéro au registre sur cette fiche.
+        unknown: Le registre ne connaît pas ce numéro.
+        read: 'Registre lu : {name} — {profession}.'
+        unavailable: 'Le registre n’a pas répondu : {error}'
+    agenda:
+        title: Agenda
+        today: Aujourd’hui
+        previous: Précédent
+        next: Suivant
+        day: Jour
+        week: Semaine
+        date: Date
+        time: Heure
+        show: Afficher
+        no_member: Aucun professionnel ne prend de rendez-vous.
+        absent: Absent
+        waiting: en salle d’attente
+        reason: Motif
+        new: Nouveau rendez-vous
+        source: Pris
+        invite: Inviter à ouvrir son espace
+        book: Enregistrer
+        requests: '{count, plural, one {Une demande à traiter} other {# demandes à traiter}}'
+        action:
+            done: Honoré
+            no_show: Absent
+            cancel: Annuler
+            move: Déplacer
+            confirm: Confirmer
+            refuse: Refuser
+        flash:
+            incomplete: 'Indiquez le professionnel, le motif, la date et l’heure.'
+            booked: 'Rendez-vous enregistré à {time} avec {member}.'
+            invited: 'Invitation envoyée à {email}.'
+            no_key: 'Sans clé de chiffrement, un motif ne peut pas être enregistré. Laissez-le vide ou configurez la clé.'
+            done: Rendez-vous marqué honoré.
+            no_show: Absence notée.
+            cancel: Rendez-vous annulé.
+            move: Rendez-vous déplacé.
+            confirm: Rendez-vous confirmé.
+    documents:
+        title: Documents
+        lead: Les documents envoyés aux personnes reçues, conservés chiffrés.
+        send: Envoyer un document
+        recipient: Destinataire
+        expires: Disponible jusqu’au
+        confidential: Contenu réservé à son auteur et à son destinataire
+        submit: Envoyer
+        mail_note: 'Le destinataire reçoit un e-mail « un document vous attend », sans le document ni son nom.'
+        list: Documents envoyés
+        state: État
+        hidden: Vous n’avez pas accès à ce document.
+        revoked: Retiré
+        read: 'Lu le {date}'
+        unread: Non lu
+        flash:
+            no_recipient: Aucun compte ne correspond à cette adresse.
+            sent: Le document est envoyé ; son destinataire est prévenu.
+    log:
+        title: Journal des accès
+        lead: Chaque dépôt, affichage, téléchargement, retrait et refus.
+        when: Quand
+        who: Qui
+        what: Quoi
+        document: Document
+        ip: Adresse IP
+        none: Rien pour le moment.
+    widget:
+        today_none: Aucun rendez-vous aujourd’hui.
+        waiting_since: 'en salle d’attente depuis {time}'
+        waiting_none: Personne en salle d’attente.
+        contact_none: Aucun message à traiter.

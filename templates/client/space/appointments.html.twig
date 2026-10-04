@@ -1,0 +1,22 @@
+{# The client's appointments: those to come (join the video room, add to a calendar, cancel), then the past. #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'space.appointments'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-space">
+    <header class="of-page-head">
+        {% if office_space_nav() %}{% include office_space_nav() %}{% endif %}
+        <h1>{{ 'space.appointments'|trans({}, 'office') }}</h1>
+        <p><a class="of-button" href="{{ path('office_booking') }}">{{ 'booking.cta'|trans({}, 'office') }}</a></p>
+    </header>
+    <h2>{{ 'space.upcoming'|trans({}, 'office') }}</h2>
+    {% if upcoming %}
+    <ul class="of-appointments">{% for appointment in upcoming %}{% include '@Office/client/space/_appointment.html.twig' with {appointment: appointment, actions: true} %}{% endfor %}</ul>
+    {% else %}<p class="of-empty">{{ 'space.no_upcoming'|trans({}, 'office') }}</p>{% endif %}
+    {% if past %}
+    <h2>{{ 'space.past'|trans({}, 'office') }}</h2>
+    <ul class="of-appointments">{% for appointment in past %}{% include '@Office/client/space/_appointment.html.twig' with {appointment: appointment} %}{% endfor %}</ul>
+    {% endif %}
+</section>
+{% endblock %}

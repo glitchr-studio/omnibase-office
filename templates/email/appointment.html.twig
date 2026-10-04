@@ -1,0 +1,19 @@
+{# An appointment's e-mail: when, with whom, where, how to cancel. Never the reason, never the type's name. #}
+{% extends '@Office/email/_layout.html.twig' %}
+{% block body %}
+<p>{{ ('booking.email.' ~ kind ~ '.lead')|trans({hours: hours_before ?? 0}, 'office') }}</p>
+<table role="presentation" style="border-collapse:collapse;margin:16px 0;">
+    {% if appointment.startsAt %}<tr><td style="padding:4px 16px 4px 0;color:#5a6660;">{{ 'booking.summary.when'|trans({}, 'office') }}</td><td style="padding:4px 0;font-weight:bold;">{{ appointment.startsAt|format_datetime('full', 'short', timezone=timezone) }}</td></tr>{% endif %}
+    <tr><td style="padding:4px 16px 4px 0;color:#5a6660;">{{ 'booking.summary.who'|trans({}, 'office') }}</td><td style="padding:4px 0;">{{ appointment.member.displayName }}</td></tr>
+    <tr><td style="padding:4px 16px 4px 0;color:#5a6660;">{{ 'booking.summary.how'|trans({}, 'office') }}</td><td style="padding:4px 0;">{{ appointment.channel.label|trans({}, 'office') }}</td></tr>
+    {% if appointment.channel.value == 'in_person' and office %}<tr><td style="padding:4px 16px 4px 0;color:#5a6660;">{{ 'booking.summary.where'|trans({}, 'office') }}</td><td style="padding:4px 0;">{{ office.name }}<br>{{ office.address }}</td></tr>{% endif %}
+</table>
+{% if series %}
+<p>{{ 'booking.email.series'|trans({count: series|length}, 'office') }}</p>
+<ul>{% for item in series %}<li>{{ item.startsAt|format_datetime('full', 'short', timezone=timezone) }}</li>{% endfor %}</ul>
+{% endif %}
+{% if space_url %}<p><a href="{{ space_url }}" style="display:inline-block;padding:12px 20px;background:#1f5f4a;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">{{ 'booking.email.space'|trans({}, 'office') }}</a></p>{% endif %}
+{% if google %}<p><a href="{{ google }}">{{ 'booking.done.google'|trans({}, 'office') }}</a></p>{% endif %}
+{% if cancel_url %}<p style="font-size:14px;">{{ 'booking.email.cancel'|trans({}, 'office') }} <a href="{{ cancel_url }}">{{ cancel_url }}</a></p>{% endif %}
+{% if office and office.phone %}<p style="font-size:14px;color:#5a6660;">{{ 'booking.email.phone'|trans({phone: office.phone}, 'office') }}</p>{% endif %}
+{% endblock %}

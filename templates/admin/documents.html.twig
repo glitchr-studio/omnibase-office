@@ -1,0 +1,74 @@
+{# The vault from the office's side (Base\Office\Controller\Admin\DocumentsController): send, the list, revoke. #}
+{% extends '@Admin/layout.html.twig' %}
+
+{% block page_title %}{{ 'admin.documents.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content_header %}
+<div class="admin-header">
+    <span class="admin-header-icon"><i class="fa-solid fa-vault"></i></span>
+    <div class="admin-header-titles">
+        <h1>{{ 'admin.documents.title'|trans({}, 'office') }}{% if recipient %} — {{ recipient }}{% endif %}</h1>
+        <div class="admin-header-subtitle">{{ 'admin.documents.lead'|trans({}, 'office') }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% include '@Office/admin/widget/_style.html.twig' %}
+<style>
+    .od { display: grid; gap: 1rem; max-width: 72rem; }
+    .od .card { padding: 1rem 1.1rem; }
+    .od h2 { font-size: 1rem; margin: 0 0 .7rem; }
+    .od-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .6rem .8rem; align-items: end; }
+    .od-form label { display: grid; gap: .2rem; font-size: .8rem; font-weight: 700; }
+    .od table { width: 100%; font-size: .88rem; }
+    .od th, .od td { padding: .45rem .5rem; border-bottom: 1px solid rgba(127,127,127,.25); text-align: left; vertical-align: top; }
+    .od .muted { opacity: .65; }
+</style>
+<div class="od">
+    {% block documents_notice %}{% endblock %}
+    <div class="card">
+        <h2>{{ 'admin.documents.send'|trans({}, 'office') }}</h2>
+        {% if ready %}
+        <form method="post" action="{{ path('office_admin_documents_send') }}" enctype="multipart/form-data" class="od-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('office-documents') }}">
+            {% if recipient %}<input type="hidden" name="client" value="{{ recipient.id }}">{% else %}
+            <label>{{ 'admin.documents.recipient'|trans({}, 'office') }}<input type="email" name="email" class="form-control" required autocomplete="off"></label>{% endif %}
+            <label>{{ 'share.deposit.name'|trans({}, 'office') }}<input type="text" name="title" class="form-control" maxlength="160" required></label>
+            <label>{{ 'share.deposit.kind'|trans({}, 'office') }}<select name="kind" class="form-select">{% for kind in kinds %}<option value="{{ kind.value }}">{{ kind.label|trans({}, 'office') }}</option>{% endfor %}</select></label>
+            <label>{{ 'share.deposit.file'|trans({}, 'office') }}<input type="file" name="file" class="form-control" required></label>
+            <label>{{ 'admin.documents.expires'|trans({}, 'office') }}<input type="date" name="expires" class="form-control"></label>
+            <label style="display:flex;gap:.4rem;align-items:center"><input type="hidden" name="confidential" value="0"><input type="checkbox" name="confidential" value="1" checked> {{ 'admin.documents.confidential'|trans({}, 'office') }}</label>
+            <div><button class="btn btn-primary" type="submit">{{ 'admin.documents.submit'|trans({}, 'office') }}</button></div>
+        </form>
+        <p class="muted" style="margin:.7rem 0 0;font-size:.82rem">{{ 'admin.documents.mail_note'|trans({}, 'office') }}</p>
+        {% else %}
+        <p class="alert alert-danger" style="margin:0">{{ 'compliance.vault_key_advice'|trans({}, 'office') }}</p>
+        {% endif %}
+    </div>
+    <div class="card">
+        <h2>{{ 'admin.documents.list'|trans({}, 'office') }}</h2>
+        <table>
+            <thead><tr><th>{{ 'admin.field.created_at'|trans({}, 'office') }}</th><th>{{ 'admin.documents.recipient'|trans({}, 'office') }}</th><th>{{ 'share.deposit.name'|trans({}, 'office') }}</th><th>{{ 'share.deposit.kind'|trans({}, 'office') }}</th><th>{{ 'admin.documents.state'|trans({}, 'office') }}</th><th></th></tr></thead>
+            <tbody>
+            {% for document in documents %}
+            <tr>
+                <td>{{ document.createdAt|format_datetime('short', 'short') }}</td>
+                <td><a href="{{ path('office_admin_documents', {client: document.recipient.id}) }}">{{ document.recipient }}</a>{% if document.sender %}<br><span class="muted">{{ 'share.from'|trans({name: office_person(document.sender)}, 'office') }}</span>{% endif %}</td>
+                <td>{% if is_granted('OFFICE_DOCUMENT_VIEW', document) %}{{ document|office_document_title }}{% else %}<span class="muted" title="{{ 'admin.documents.hidden'|trans({}, 'office') }}">•••••</span>{% endif %}</td>
+                <td>{{ document.kind.label|trans({}, 'office') }}</td>
+                <td>{% if document.revoked %}{{ 'admin.documents.revoked'|trans({}, 'office') }}{% elseif document.expired %}{{ 'share.gone'|trans({}, 'office') }}{% elseif document.read %}{{ 'admin.documents.read'|trans({date: document.readAt|format_datetime('short', 'short')}, 'office') }}{% else %}{{ 'admin.documents.unread'|trans({}, 'office') }}{% endif %}</td>
+                <td>
+                    {% if is_granted('OFFICE_DOCUMENT_READ', document) %}<a class="btn btn-sm" href="{{ path('office_document_download', {id: document.id}) }}" target="_top" data-transparent="false">{{ 'share.download'|trans({}, 'office') }}</a>{% endif %}
+                    {% if is_granted('OFFICE_DOCUMENT_REVOKE', document) %}<form method="post" action="{{ path('office_admin_documents_revoke', {id: document.id}) }}" style="display:inline"><input type="hidden" name="_token" value="{{ csrf_token('office-documents-' ~ document.id) }}"><button class="btn text-danger btn-sm" type="submit">{{ 'share.revoke'|trans({}, 'office') }}</button></form>{% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}<a class="btn btn-sm" href="{{ path('office_admin_access_log', {document: document.id}) }}">{{ 'admin.log.title'|trans({}, 'office') }}</a>{% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="muted">{{ 'share.none'|trans({}, 'office') }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

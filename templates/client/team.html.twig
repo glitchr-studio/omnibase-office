@@ -1,0 +1,26 @@
+{# The team, grouped as the members' category says (Base\Office\Controller\Client\OfficeController::team). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'team.title'|trans({}, 'office') }}{% endblock %}
+{% block description %}{{ 'team.lead'|trans({office: office ? office.name : ''}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-team">
+    <header class="of-page-head">
+        <h1>{{ 'team.title'|trans({}, 'office') }}</h1>
+        <p class="of-lead">{{ 'team.lead'|trans({office: office ? office.name : ''}, 'office') }}</p>
+    </header>
+    {% for category, list in groups %}
+    <section class="of-team-group" aria-labelledby="of-group-{{ loop.index }}">
+        {% if category %}<h2 id="of-group-{{ loop.index }}">{{ category }}</h2>{% endif %}
+        <ul class="of-cards">
+            {% for member in list %}
+            <li>{% include '@Office/client/_member_card.html.twig' with {member: member} only %}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% else %}
+    <p class="of-empty">{{ 'team.empty'|trans({}, 'office') }}</p>
+    {% endfor %}
+</section>
+{% endblock %}

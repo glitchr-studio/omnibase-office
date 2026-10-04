@@ -1,0 +1,170 @@
+{#
+ # The agenda (Base\Office\Controller\Admin\AgendaController): a grid drawn by
+ # hand - an hour a row, a member (day view) or a day (week view) a column -,
+ # the quick booking, the requests waiting. A member reads the reason of their
+ # own appointments; elsewhere the time is only shown as taken.
+ #}
+{% extends '@Admin/layout.html.twig' %}
+
+{% block page_title %}{{ 'admin.agenda.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content_header %}
+<div class="admin-header">
+    <span class="admin-header-icon"><i class="fa-solid fa-calendar-week"></i></span>
+    <div class="admin-header-titles">
+        <h1>{{ 'admin.agenda.title'|trans({}, 'office') }}</h1>
+        <div class="admin-header-subtitle">{% if view == 'week' %}{{ from|format_datetime('long', 'none', timezone=timezone) }} – {{ to|date_modify('-1 day')|format_datetime('long', 'none', timezone=timezone) }}{% if selected %} · {{ selected.displayName }}{% endif %}{% else %}{{ date|format_datetime('full', 'none', timezone=timezone) }}{% endif %}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% set hours = end_hour - start_hour %}
+<style>
+    .oa { display: grid; gap: 1rem; }
+    .oa-bar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+    .oa-bar .spacer { flex: 1; }
+    .oa-bar a, .oa-bar button, .oa-bar select, .oa-bar input { min-height: 2.25rem; }
+    .oa-grid { display: grid; grid-template-columns: 3.2rem repeat(var(--cols), minmax(8.5rem, 1fr)); overflow-x: auto; border: 1px solid rgba(127,127,127,.3); border-radius: .6rem; background: var(--bs-body-bg, #fff); }
+    .oa-head { position: sticky; top: 0; z-index: 2; padding: .5rem .4rem; font-weight: 700; font-size: .85rem; text-align: center; border-bottom: 1px solid rgba(127,127,127,.3); background: inherit; }
+    .oa-head small { display: block; font-weight: 400; opacity: .7; }
+    .oa-hours, .oa-col { position: relative; height: calc({{ hours }} * 3.6rem); }
+    .oa-hours span { position: absolute; right: .4rem; transform: translateY(-50%); font-size: .72rem; opacity: .65; font-variant-numeric: tabular-nums; }
+    .oa-col { border-left: 1px solid rgba(127,127,127,.22); background-image: repeating-linear-gradient(to bottom, rgba(127,127,127,.2) 0, rgba(127,127,127,.2) 1px, transparent 1px, transparent 3.6rem); background-color: rgba(127,127,127,.07); }
+    .oa-open { position: absolute; left: 0; right: 0; background: var(--bs-body-bg, #fff); opacity: .95; }
+    .oa-block { position: absolute; left: .2rem; right: .2rem; overflow: hidden; padding: .15rem .35rem; border-radius: .35rem; font-size: .74rem; line-height: 1.2; color: #10231c; background: #cfe6dc; border-left: .25rem solid var(--member, #1f5f4a); }
+    .oa-block.is-absence { background: repeating-linear-gradient(45deg, rgba(127,127,127,.25) 0 6px, rgba(127,127,127,.12) 6px 12px); border-left-color: #777; color: inherit; }
+    .oa-block.is-requested { background: #fde9b8; }
+    .oa-block.is-done { background: #dfe3e1; }
+    .oa-block.is-no_show { background: #f6cfcf; }
+    .oa-block.is-waiting { outline: 3px solid #b7791f; }
+    .oa-block details { position: static; }
+    .oa-block summary { cursor: pointer; list-style: none; font-weight: 700; }
+    .oa-block summary::-webkit-details-marker { display: none; }
+    .oa-pop { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(26rem, 92vw); max-height: 86vh; overflow: auto; padding: 1rem; border-radius: .7rem; background: var(--bs-body-bg, #fff); color: var(--bs-body-color, #111); box-shadow: 0 1rem 3rem rgba(0,0,0,.35); font-size: .88rem; }
+    .oa-pop form { display: inline-block; margin: .2rem .2rem 0 0; }
+    .oa-pop dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .8rem; margin: .5rem 0; }
+    .oa-pop dd { margin: 0; }
+    .oa-card { padding: 1rem 1.1rem; }
+    .oa-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .6rem .8rem; align-items: end; }
+    .oa-form label { display: grid; gap: .2rem; font-size: .8rem; font-weight: 700; }
+    .oa-form input, .oa-form select, .oa-form textarea { width: 100%; }
+    .oa-form .wide { grid-column: 1 / -1; }
+    .oa-requests { margin: 0; padding: 0; list-style: none; display: grid; gap: .6rem; }
+    .oa-requests form { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: .3rem; }
+</style>
+
+<div class="oa">
+    <div class="oa-bar">
+        {% set step = view == 'week' ? '7 days' : '1 day' %}
+        <a class="btn" href="{{ path('office_admin_agenda', {view: view, member: selected ? selected.id : null, date: date|date_modify('-' ~ step)|date('Y-m-d')}) }}" aria-label="{{ 'admin.agenda.previous'|trans({}, 'office') }}"><i class="fa-solid fa-chevron-left"></i></a>
+        <a class="btn" href="{{ path('office_admin_agenda', {view: view, member: selected ? selected.id : null}) }}">{{ 'admin.agenda.today'|trans({}, 'office') }}</a>
+        <a class="btn" href="{{ path('office_admin_agenda', {view: view, member: selected ? selected.id : null, date: date|date_modify('+' ~ step)|date('Y-m-d')}) }}" aria-label="{{ 'admin.agenda.next'|trans({}, 'office') }}"><i class="fa-solid fa-chevron-right"></i></a>
+        <form method="get" action="{{ path('office_admin_agenda') }}" class="oa-bar">
+            <input type="hidden" name="view" value="{{ view }}">
+            <input type="date" name="date" value="{{ date|date('Y-m-d') }}" class="form-control" style="width:auto" aria-label="{{ 'admin.agenda.date'|trans({}, 'office') }}">
+            {% if view == 'week' %}
+            <select name="member" class="form-select" style="width:auto" aria-label="{{ 'admin.field.member'|trans({}, 'office') }}">
+                {% for member in members %}<option value="{{ member.id }}"{{ selected and selected.id == member.id ? ' selected' }}>{{ member.displayName }}</option>{% endfor %}
+            </select>
+            {% endif %}
+            <button class="btn" type="submit">{{ 'admin.agenda.show'|trans({}, 'office') }}</button>
+        </form>
+        <span class="spacer"></span>
+        <a class="btn {{ view == 'day' ? 'btn-primary' : 'btn-outline-secondary' }}" href="{{ path('office_admin_agenda', {view: 'day', date: date|date('Y-m-d')}) }}">{{ 'admin.agenda.day'|trans({}, 'office') }}</a>
+        <a class="btn {{ view == 'week' ? 'btn-primary' : 'btn-outline-secondary' }}" href="{{ path('office_admin_agenda', {view: 'week', date: date|date('Y-m-d'), member: selected ? selected.id : null}) }}">{{ 'admin.agenda.week'|trans({}, 'office') }}</a>
+    </div>
+
+    <div class="oa-grid" style="--cols: {{ columns|length ?: 1 }}" role="table" aria-label="{{ 'admin.agenda.title'|trans({}, 'office') }}">
+        <div class="oa-head"></div>
+        {% for column in columns %}
+        <div class="oa-head">{% if view == 'week' %}{{ column.day|format_datetime(pattern='EEE d', timezone=timezone) }}{% else %}{{ column.label }}<small>{{ column.member.title }}</small>{% endif %}</div>
+        {% else %}
+        <div class="oa-head">{{ 'admin.agenda.no_member'|trans({}, 'office') }}</div>
+        {% endfor %}
+
+        <div class="oa-hours">{% for h in start_hour..end_hour %}<span style="top: {{ (h - start_hour) / hours * 100 }}%">{{ '%02d'|format(h) }}:00</span>{% endfor %}</div>
+        {% for column in columns %}
+        <div class="oa-col"{% if column.member and column.member.color %} style="--member: {{ column.member.color }}"{% endif %}>
+            {% for open in column.open %}<div class="oa-open" style="top: {{ open.top }}%; height: {{ open.height }}%"></div>{% endfor %}
+            {% for block in column.blocks %}
+                {% if block.kind == 'absence' %}
+                <div class="oa-block is-absence" style="top: {{ block.top }}%; height: {{ block.height }}%">{{ 'admin.agenda.absent'|trans({}, 'office') }}</div>
+                {% else %}
+                {% set a = block.appointment %}
+                <div class="oa-block is-{{ a.status.value }}{{ block.waiting ? ' is-waiting' }}" style="top: {{ block.top }}%; height: {{ block.height }}%">
+                    <details>
+                        <summary>{{ a.startsAt|date('H:i', timezone) }} {{ a.clientName ?? '—' }}{% if block.waiting %} · {{ 'admin.agenda.waiting'|trans({}, 'office') }}{% endif %}</summary>
+                        <div class="oa-pop" role="dialog" aria-label="{{ a.clientName }}">
+                            <strong>{{ a.startsAt|format_datetime('full', 'short', timezone=timezone) }}</strong>
+                            <dl>
+                                <dt>{{ 'admin.field.client'|trans({}, 'office') }}</dt><dd>{{ a.clientName ?? '—' }}{% if a.beneficiary %} ({{ a.beneficiary }}){% endif %}</dd>
+                                <dt>{{ 'admin.field.type'|trans({}, 'office') }}</dt><dd>{{ a.type.name }} · {{ a.channel.label|trans({}, 'office') }}</dd>
+                                {% if a.clientPhone %}<dt>{{ 'admin.field.phone'|trans({}, 'office') }}</dt><dd><a href="tel:{{ a.clientPhone }}">{{ a.clientPhone }}</a></dd>{% endif %}
+                                {% if a.address %}<dt>{{ 'admin.field.address'|trans({}, 'office') }}</dt><dd>{{ a.address }}</dd>{% endif %}
+                                <dt>{{ 'admin.field.status'|trans({}, 'office') }}</dt><dd>{{ a.status.label|trans({}, 'office') }} · {{ a.source.label|trans({}, 'office') }}</dd>
+                                {% if block.own and a.reasonCipher %}<dt>{{ 'admin.agenda.reason'|trans({}, 'office') }}</dt><dd>{{ a|office_reason }}</dd>{% endif %}
+                            </dl>
+                            {% set room = block.own ? office_room(a) : null %}
+                            {% if room %}<p><a class="btn btn-primary btn-sm" href="{{ path('office_visio_room', {token: room.token}) }}" target="_top">{{ 'visio.join'|trans({}, 'office') }}</a></p>{% endif %}
+                            {% if a.active %}
+                            {% for action in ['done', 'no_show', 'cancel'] %}
+                            <form method="post" action="{{ path('office_admin_agenda_action', {id: a.id, action: action}) }}"><input type="hidden" name="_token" value="{{ csrf_token('office-agenda-' ~ a.id) }}"><button class="btn btn-sm" type="submit">{{ ('admin.agenda.action.' ~ action)|trans({}, 'office') }}</button></form>
+                            {% endfor %}
+                            <form method="post" action="{{ path('office_admin_agenda_action', {id: a.id, action: 'move'}) }}" style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.6rem">
+                                <input type="hidden" name="_token" value="{{ csrf_token('office-agenda-' ~ a.id) }}">
+                                <input type="date" name="date" value="{{ a.startsAt|date('Y-m-d', timezone) }}" class="form-control form-control-sm" style="width:auto" aria-label="{{ 'admin.agenda.date'|trans({}, 'office') }}">
+                                <input type="time" name="time" value="{{ a.startsAt|date('H:i', timezone) }}" step="300" class="form-control form-control-sm" style="width:auto" aria-label="{{ 'admin.agenda.time'|trans({}, 'office') }}">
+                                <button class="btn btn-sm" type="submit">{{ 'admin.agenda.action.move'|trans({}, 'office') }}</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </details>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card oa-card">
+        <h2 style="font-size:1rem;margin:0 0 .7rem">{{ 'admin.agenda.new'|trans({}, 'office') }}</h2>
+        <form method="post" action="{{ path('office_admin_agenda_book') }}" class="oa-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('office-agenda') }}">
+            <input type="hidden" name="view" value="{{ view }}">
+            <label>{{ 'admin.field.member'|trans({}, 'office') }}<select name="member" class="form-select" required>{% for member in members %}<option value="{{ member.id }}"{{ selected and selected.id == member.id ? ' selected' }}>{{ member.displayName }}</option>{% endfor %}</select></label>
+            <label>{{ 'admin.field.type'|trans({}, 'office') }}<select name="type" class="form-select" required>{% for type in types %}<option value="{{ type.id }}">{{ type.name }} ({{ type.duration }} min)</option>{% endfor %}</select></label>
+            <label>{{ 'admin.agenda.date'|trans({}, 'office') }}<input type="date" name="date" value="{{ date|date('Y-m-d') }}" class="form-control" required></label>
+            <label>{{ 'admin.agenda.time'|trans({}, 'office') }}<input type="time" name="time" step="300" class="form-control" required></label>
+            <label>{{ 'admin.field.client'|trans({}, 'office') }}<input type="text" name="name" class="form-control" autocomplete="off" required></label>
+            <label>{{ 'admin.field.email'|trans({}, 'office') }}<input type="email" name="email" class="form-control" autocomplete="off"></label>
+            <label>{{ 'admin.field.phone'|trans({}, 'office') }}<input type="tel" name="phone" class="form-control" autocomplete="off"></label>
+            <label>{{ 'admin.field.beneficiary'|trans({}, 'office') }}<input type="text" name="beneficiary" class="form-control" autocomplete="off"></label>
+            <label class="wide">{{ 'admin.field.address'|trans({}, 'office') }}<input type="text" name="address" class="form-control" autocomplete="off"></label>
+            <label>{{ 'admin.agenda.source'|trans({}, 'office') }}<select name="source" class="form-select"><option value="phone">{{ 'source.phone'|trans({}, 'office') }}</option><option value="staff">{{ 'source.staff'|trans({}, 'office') }}</option></select></label>
+            <label style="display:flex;gap:.4rem;align-items:center"><input type="checkbox" name="invite" value="1" checked> {{ 'admin.agenda.invite'|trans({}, 'office') }}</label>
+            <div><button class="btn btn-primary" type="submit">{{ 'admin.agenda.book'|trans({}, 'office') }}</button></div>
+        </form>
+    </div>
+
+    {% if requests %}
+    <div class="card oa-card">
+        <h2 style="font-size:1rem;margin:0 0 .7rem">{{ 'admin.agenda.requests'|trans({count: requests|length}, 'office') }}</h2>
+        <ul class="oa-requests">
+            {% for a in requests %}
+            <li>
+                <strong>{{ a.clientName ?? '—' }}</strong> · {{ a.type.name }} · {{ a.member.displayName }}{% if a.startsAt %} · {{ a.startsAt|format_datetime('medium', 'short', timezone=timezone) }}{% endif %}{% if a.address %} · {{ a.address }}{% endif %}
+                <form method="post" action="{{ path('office_admin_agenda_action', {id: a.id, action: 'confirm'}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('office-agenda-' ~ a.id) }}">
+                    <input type="date" name="date" value="{{ a.startsAt ? a.startsAt|date('Y-m-d', timezone) : date|date('Y-m-d') }}" class="form-control form-control-sm" style="width:auto" aria-label="{{ 'admin.agenda.date'|trans({}, 'office') }}">
+                    <input type="time" name="time" value="{{ a.startsAt ? a.startsAt|date('H:i', timezone) : '' }}" step="300" class="form-control form-control-sm" style="width:auto" required aria-label="{{ 'admin.agenda.time'|trans({}, 'office') }}">
+                    <button class="btn btn-primary btn-sm" type="submit">{{ 'admin.agenda.action.confirm'|trans({}, 'office') }}</button>
+                    <button class="btn btn-sm" type="submit" formaction="{{ path('office_admin_agenda_action', {id: a.id, action: 'cancel'}) }}" formnovalidate>{{ 'admin.agenda.action.refuse'|trans({}, 'office') }}</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

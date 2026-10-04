@@ -1,0 +1,7 @@
+{# The invitation to open one's account. #}
+{% extends '@Office/email/_layout.html.twig' %}
+{% block body %}
+<p>{{ 'invitation.email.hello'|trans({name: invitation.name}, 'office') }}</p>
+<p>{{ 'invitation.email.body'|trans({days: days}, 'office') }}</p>
+<p><a href="{{ url }}" style="display:inline-block;padding:12px 20px;background:#1f5f4a;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">{{ 'invitation.email.button'|trans({}, 'office') }}</a></p>
+{% endblock %}

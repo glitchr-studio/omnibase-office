@@ -1,0 +1,29 @@
+{# The client's documents (Base\Office\Controller\Client\ShareController::index). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'space.documents'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-space">
+    <header class="of-page-head">
+        {% if office_space_nav() %}{% include office_space_nav() %}{% endif %}
+        <h1>{{ 'space.documents'|trans({}, 'office') }}</h1>
+        <p class="of-lead">{{ 'share.lead'|trans({}, 'office') }}</p>
+    </header>
+    {% include '@Office/client/space/_documents.html.twig' %}
+
+    <h2>{{ 'share.deposit.title'|trans({}, 'office') }}</h2>
+    {% if ready %}
+    <form method="post" action="{{ path('office_document_deposit') }}" enctype="multipart/form-data" class="of-form of-narrow">
+        <input type="hidden" name="_token" value="{{ csrf_token('office_deposit') }}">
+        <div class="of-field"><label for="of-doc-title">{{ 'share.deposit.name'|trans({}, 'office') }}</label><input id="of-doc-title" name="title" type="text" maxlength="160" required></div>
+        <div class="of-field"><label for="of-doc-kind">{{ 'share.deposit.kind'|trans({}, 'office') }}</label>
+            <select id="of-doc-kind" name="kind">{% for kind in kinds %}<option value="{{ kind.value }}">{{ kind.label|trans({}, 'office') }}</option>{% endfor %}</select></div>
+        <div class="of-field"><label for="of-doc-file">{{ 'share.deposit.file'|trans({}, 'office') }}</label><input id="of-doc-file" name="file" type="file" accept="application/pdf,image/*" required aria-describedby="of-doc-help"><p id="of-doc-help" class="of-help">{{ 'share.deposit.help'|trans({}, 'office') }}</p></div>
+        <button type="submit" class="of-button">{{ 'share.deposit.submit'|trans({}, 'office') }}</button>
+    </form>
+    {% else %}
+    <p class="of-notice">{{ 'share.error.unavailable'|trans({}, 'office') }}</p>
+    {% endif %}
+</section>
+{% endblock %}

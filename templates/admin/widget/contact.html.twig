@@ -1,0 +1,10 @@
+{# Contact requests not handled yet (Base\Office\Admin\Widget\ContactRequestsWidgetType). #}
+<div class="analytics-card card office-widget">
+    <div class="analytics-card-header"><h2 class="analytics-card-title">{{ widget.label|trans({}, 'admin') }}</h2></div>
+    <div class="office-widget-body">
+        {% if requests %}
+        <ul>{% for request in requests %}<li><a href="{{ path('admin_crud_contact_requests_detail', {entityId: request.id}) }}"><b>{{ request.name }}</b></a> · {{ request.createdAt|format_datetime('short', 'short') }}<br><small>{{ request.message|length > 90 ? request.message|slice(0, 90) ~ '…' : request.message }}</small></li>{% endfor %}</ul>
+        {% else %}<p class="office-widget-empty">{{ 'admin.widget.contact_none'|trans({}, 'office') }}</p>{% endif %}
+    </div>
+</div>
+{% include '@Office/admin/widget/_style.html.twig' %}

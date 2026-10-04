@@ -1,0 +1,25 @@
+{# Booking, step 4: confirm (signed in). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'booking.confirm.title'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking of-narrow">
+    <header class="of-page-head">
+        <p class="of-back"><a href="{{ path('office_booking_slots', {slug: member.slug, type: type.slug}) }}">← {{ 'booking.back_when'|trans({}, 'office') }}</a></p>
+        <h1>{{ 'booking.confirm.title'|trans({}, 'office') }}</h1>
+        {% include '@Office/client/booking/_steps.html.twig' with {step: 4} only %}
+    </header>
+    <dl class="of-summary">
+        <div><dt>{{ 'booking.summary.when'|trans({}, 'office') }}</dt><dd>{{ start|format_datetime('full', 'short', locale=app.request.locale, timezone=office_timezone()) }}</dd></div>
+        <div><dt>{{ 'booking.summary.who'|trans({}, 'office') }}</dt><dd>{{ member.displayName }}</dd></div>
+        <div><dt>{{ 'booking.summary.what'|trans({}, 'office') }}</dt><dd>{{ type.name }} · {{ type.channel.label|trans({}, 'office') }}</dd></div>
+    </dl>
+    {% if type.instructions %}<p class="of-notice">{{ type.instructions|nl2br }}</p>{% endif %}
+    <form method="post" class="of-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('office_booking') }}">
+        {% include '@Office/client/booking/_fields.html.twig' %}
+        <button type="submit" class="of-button">{{ (type.manualConfirmation ? 'booking.confirm.ask' : 'booking.confirm.submit')|trans({}, 'office') }}</button>
+    </form>
+</section>
+{% endblock %}
