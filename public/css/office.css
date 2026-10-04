@@ -7,6 +7,8 @@
 .of-page { --_accent: var(--of-accent, #1f5f4a); --_accent-ink: var(--of-accent-ink, #fff); --_ink: var(--of-ink, #1c2421); --_muted: var(--of-muted, #55615b); --_line: var(--of-line, #d5dbd4); --_surface: var(--of-surface, #f4f6f2); --_danger: var(--of-danger, #a4262c); --_radius: var(--of-radius, .6rem);
     max-width: 68rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; color: var(--_ink); }
 .of-narrow { max-width: 40rem; }
+/* The hidden attribute wins over the shapes below: a button not offered yet is not shown. */
+.of-page [hidden] { display: none !important; }
 .of-page h1 { margin: 0 0 .4rem; font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1.15; }
 .of-page h2 { margin: 2rem 0 .7rem; font-size: 1.2rem; }
 .of-page h3 { margin: 1.2rem 0 .3rem; font-size: 1rem; }
