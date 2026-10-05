@@ -127,15 +127,15 @@
 
     <div class="of-visio-controls" role="toolbar" aria-label="{{ 'visio.controls'|trans({}, 'office') }}">
         <button type="button" class="of-button" data-visio-join>{{ (is_host ? 'visio.start' : 'visio.enter')|trans({}, 'office') }}</button>
-        {% if kind == 'link' %}
-        <a class="of-button" data-visio-link href="{{ access.url }}" target="_blank" rel="noopener noreferrer" hidden>{{ 'visio.provider.go'|trans({host: third_parties|join(', ')}, 'office') }}</a>
-        {% endif %}
+        {# The provider's address: all there is for a "link" gateway, and what is offered when a frame does not start. #}
+        <a class="of-button{{ kind == 'frame' ? ' of-button-quiet' }}" data-visio-link href="{{ access.url }}" target="_blank" rel="noopener noreferrer" hidden>{{ 'visio.provider.go'|trans({host: third_parties|join(', ')}, 'office') }}</a>
         <button type="button" class="of-button of-button-danger" data-visio-hangup hidden>{{ (is_host ? 'visio.end' : 'visio.leave')|trans({}, 'office') }}</button>
     </div>
 
     <script type="application/json" data-visio-texts>{{ texts|merge({
         provider_ready: 'visio.status.provider_ready'|trans({}, 'office'),
         consent_needed: 'visio.status.consent_needed'|trans({}, 'office'),
+        unreachable: 'visio.status.unreachable'|trans({}, 'office'),
         consent_label: 'visio.provider.consent_label'|trans({}, 'office'),
         consent_description: 'visio.provider.consent_description'|trans({host: third_parties|join(', ')}, 'office')
     })|json_encode|raw }}</script>

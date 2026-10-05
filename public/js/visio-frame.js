@@ -33,6 +33,7 @@
         var pilot = $('pilot'), iframe = $('iframe'), link = $('link'), consentBtn = $('consent');
 
         var joined = false, entered = false, over = false, timer = null;
+        var presenceUrl = root.dataset.signalUrl + (root.dataset.signalUrl.indexOf('?') < 0 ? '?' : '&') + 'after=0';
         var feature = root.dataset.consent || '', allowed = !feature, wired = false;
 
         function status(key) {
@@ -56,7 +57,11 @@
             else if (link) { show(link, true); status('connected'); }
         }
         function leave(everyone) {
-            if (pilot) tell(everyone ? 'omnimeet:end' : 'omnimeet:leave');
+            if (pilot) {
+                tell(everyone ? 'omnimeet:end' : 'omnimeet:leave');
+                // Whatever the provider's interface answers, its frame goes.
+                setTimeout(function () { if (pilot.omnimeet && pilot.omnimeet.dispose) pilot.omnimeet.dispose(); }, 5000);
+            }
             if (iframe) iframe.removeAttribute('src');
             show(stage, false);
             show(link, false);
@@ -65,15 +70,17 @@
 
         function poll() {
             if (over) return Promise.resolve();
-            return request('GET', root.dataset.signalUrl + '?after=0')
+            return request('GET', presenceUrl)
                 .then(function (response) { return response.ok ? response.json() : Promise.reject(response.status); })
                 .then(function (data) {
+                    // An answer that was on its way when the room was left changes nothing any more.
+                    if (over) return;
                     if (data.ended || !data.open) { finish(false); return; }
                     if (!joined) return;
                     if (isHost) {
                         enter();
                         // Once in: "connected" while the guest is there too, "waiting" until then and when they left.
-                        if (root.dataset.visioState !== 'connecting') status(data.guest ? 'connected' : 'waiting_guest');
+                        if (root.dataset.visioState !== 'connecting' && root.dataset.visioState !== 'unreachable') status(data.guest ? 'connected' : 'waiting_guest');
                     } else if (data.host) {
                         enter();
                     } else if (!entered) {
@@ -116,7 +123,9 @@
         if (hangBtn) hangBtn.addEventListener('click', function () { finish(true); });
         if (pilot) pilot.addEventListener('omnimeet:state', function (event) {
             var state = event.detail && event.detail.state;
-            if (state === 'joined') status('connected');
+            if (state === 'joined') { status('connected'); show(link, false); }
+            // The frame never started (an instance may refuse to be embedded): its address, in a tab of its own.
+            else if (state === 'error' && event.detail.name === 'timeout') { status('unreachable'); show(stage, false); show(link, true); }
             else if (state === 'error') status('lost');
             // Hung up inside the provider's own interface: the same as hanging up here.
             else if (state === 'left' && entered && !over) finish(true);
@@ -149,7 +158,7 @@
         window.addEventListener('load', wire);
 
         // A room closed while the page sat open says so, joined or not.
-        (function watch() { if (over) return; if (!joined) request('GET', root.dataset.signalUrl + '?after=0').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && (d.ended || !d.open)) finish(false); }).catch(function () {}); setTimeout(watch, 15000); })();
+        (function watch() { if (over) return; if (!joined) request('GET', presenceUrl).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && (d.ended || !d.open)) finish(false); }).catch(function () {}); setTimeout(watch, 15000); })();
     }
 
     function boot() { document.querySelectorAll('[data-office-visio-frame]').forEach(start); }

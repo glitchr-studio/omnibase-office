@@ -275,6 +275,7 @@ visio:
         lost: Connexion interrompue, nouvelle tentative…
         provider_ready: Tout est prêt. Entrez quand vous voulez.
         consent_needed: Autorisez la visio pour entrer — elle passe par un service extérieur à ce site.
+        unreachable: La visio ne s’affiche pas dans cette page. Ouvrez-la dans un nouvel onglet.
 
 compliance:
     failed: 'Vérification impossible : {error}'
