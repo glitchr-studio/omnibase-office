@@ -1,0 +1,47 @@
+{# Asking for a first appointment, without an account (Base\Office\Controller\Client\RequestController; office.templates.request to give another). #}
+{% extends office_layout() %}
+
+{% block title %}{{ 'appointment_request.title'|trans({}, 'office') }}{% endblock %}
+{% block description %}{{ 'appointment_request.lead'|trans({}, 'office') }}{% endblock %}
+
+{% block content %}
+<section class="of-page of-booking of-request">
+    <header class="of-page-head">
+        <h1>{{ 'appointment_request.title'|trans({}, 'office') }}</h1>
+        <p class="of-lead">{{ 'appointment_request.lead'|trans({}, 'office') }}</p>
+    </header>
+    {% if sent %}
+    <p class="of-success" role="status">{{ 'appointment_request.sent'|trans({}, 'office') }}</p>
+    {% elseif not available %}
+    <p class="of-empty">{{ 'appointment_request.none'|trans({}, 'office') }}{% if office and office.phone %} <a class="of-phone" href="tel:{{ office.phone|replace({' ': ''}) }}">{{ office.phone }}</a>{% endif %}</p>
+    {% else %}
+    <div class="of-columns">
+        <div>
+            <p class="of-warning">{{ 'appointment_request.notice'|trans({}, 'office')|raw }}</p>
+            {{ form_start(form, {attr: {class: 'of-form', novalidate: 'novalidate'}}) }}
+                {{ form_errors(form) }}
+                {{ form_row(form.type) }}
+                {{ form_row(form.member) }}
+                {{ form_row(form.name) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.phone) }}
+                {{ form_row(form.message) }}
+                {{ form_row(form.website) }}
+                {{ form_row(form.privacy) }}
+                <button type="submit" class="of-button">{{ 'appointment_request.submit'|trans({}, 'office') }}</button>
+            {{ form_end(form) }}
+        </div>
+        <aside>
+            <h2>{{ 'appointment_request.how'|trans({}, 'office') }}</h2>
+            <ol class="of-steps">
+                <li>{{ 'appointment_request.how_1'|trans({}, 'office') }}</li>
+                <li>{{ 'appointment_request.how_2'|trans({}, 'office') }}</li>
+                <li>{{ 'appointment_request.how_3'|trans({}, 'office') }}</li>
+            </ol>
+            {% if app.user %}<p><a href="{{ path('office_space_appointments') }}">{{ 'appointment_request.appointments'|trans({}, 'office') }}</a></p>{% endif %}
+            {% if office and office.phone %}<p>{{ 'appointment_request.phone_instead'|trans({}, 'office') }} <a class="of-phone" href="tel:{{ office.phone|replace({' ': ''}) }}">{{ office.phone }}</a></p>{% endif %}
+        </aside>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

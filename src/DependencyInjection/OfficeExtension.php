@@ -17,11 +17,22 @@ class OfficeExtension extends AbstractBaseExtension implements PrependExtensionI
     }
 
     /**
-     * The private storage of the vault when the application has not declared it. (The UTC moment type the
+     * The practice's name for the texts, and the private storage of the vault when the application has not declared it. (The UTC moment type the
      * entities use, utc_datetime_immutable, is glitchr/omnibase's: Base\Database\Type\UtcDateTimeImmutableType.)
      */
     public function prepend(ContainerBuilder $container): void
     {
+        // The practice's name in the bundle's texts ({the_practice}...), from office.vocabulary - read here as it is
+        // written, the last file that sets it winning: the texts need it wherever they are translated.
+        if ($container->hasExtension('framework')) {
+            $practice = 'cabinet';
+            foreach ($container->getExtensionConfig('office') as $config) {
+                if (isset($config['vocabulary']['practice'])) {
+                    $practice = $config['vocabulary']['practice'];
+                }
+            }
+            $container->prependExtensionConfig('framework', ['translator' => ['globals' => Vocabulary::globals($practice)]]);
+        }
         if (!$container->hasExtension('flysystem')) {
             return;
         }

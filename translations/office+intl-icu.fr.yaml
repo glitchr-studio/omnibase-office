@@ -8,7 +8,7 @@ day:
     7: dimanche
 
 channel:
-    in_person: Au cabinet
+    in_person: '{At_the_practice}'
     video: En visio
     home: À domicile
     phone: Par téléphone
@@ -20,7 +20,7 @@ mode:
 bookable_by:
     everyone: Tout le monde
     known: Personnes déjà reçues
-    staff: Le cabinet seulement
+    staff: '{The_practice} seulement'
 
 status:
     requested: En attente de confirmation
@@ -32,7 +32,7 @@ status:
 source:
     online: En ligne
     phone: Par téléphone
-    staff: Au cabinet
+    staff: '{At_the_practice}'
 
 kind:
     result: Résultat
@@ -84,7 +84,7 @@ contact:
 booking:
     cta: Prendre rendez-vous
     title: Prendre rendez-vous
-    none: La prise de rendez-vous en ligne n’est pas ouverte pour le moment — appelez le cabinet.
+    none: 'La prise de rendez-vous en ligne n’est pas ouverte pour le moment — appelez {the_practice}.'
     back_who: Choisir quelqu’un d’autre
     back_when: Choisir un autre créneau
     minutes: '{minutes} min'
@@ -94,7 +94,7 @@ booking:
     no_slot_day: Aucun créneau
     no_slot_week: Aucun créneau libre cette semaine.
     next_slot: 'Prochain créneau : {date}'
-    to_be_fixed: Date à fixer par le cabinet
+    to_be_fixed: 'Date à fixer par {the_practice}'
     sign_in: Se connecter pour faire la demande
     for: Pour
     for_me: Moi-même
@@ -119,7 +119,7 @@ booking:
         submit: Confirmer le rendez-vous
         ask: Envoyer la demande
     request:
-        lead: Décrivez votre besoin, le cabinet vous propose une date.
+        lead: 'Décrivez votre besoin, {the_practice} vous propose une date.'
         submit: Envoyer la demande
     done:
         title_confirmed: Rendez-vous confirmé
@@ -141,18 +141,18 @@ booking:
         cancelled: Le rendez-vous est annulé.
     error:
         slot_taken: Ce créneau vient d’être pris. Choisissez-en un autre.
-        too_late: 'Il n’est plus possible d’annuler en ligne à moins de {hours} h du rendez-vous — appelez le cabinet.'
-        not_bookable: Ce rendez-vous ne se prend pas en ligne — appelez le cabinet.
+        too_late: 'Il n’est plus possible d’annuler en ligne à moins de {hours} h du rendez-vous — appelez {the_practice}.'
+        not_bookable: 'Ce rendez-vous ne se prend pas en ligne — appelez {the_practice}.'
         request_only: Ce rendez-vous se demande, il ne se réserve pas.
         not_active: Ce rendez-vous n’est plus en cours.
         no_time: Indiquez la date et l’heure.
         overlap: 'Un autre rendez-vous occupe déjà ce moment ({at}).'
         series_length: Une série compte de 1 à 120 rendez-vous.
-        outside_area: Cette adresse est hors de la zone où le cabinet se déplace.
+        outside_area: 'Cette adresse est hors de la zone où {the_practice} se déplace.'
     email:
         booked: { subject: 'Rendez-vous confirmé — {date}', lead: Votre rendez-vous est confirmé. }
-        requested: { subject: Votre demande de rendez-vous est bien reçue, lead: 'Votre demande est enregistrée. Le cabinet vous la confirme dès que possible.' }
-        confirmed: { subject: 'Rendez-vous confirmé — {date}', lead: Le cabinet a confirmé votre rendez-vous. }
+        requested: { subject: Votre demande de rendez-vous est bien reçue, lead: 'Votre demande est enregistrée. {The_practice} vous la confirme dès que possible.' }
+        confirmed: { subject: 'Rendez-vous confirmé — {date}', lead: '{The_practice} a confirmé votre rendez-vous.' }
         moved: { subject: 'Rendez-vous déplacé — {date}', lead: 'Votre rendez-vous a été déplacé. Voici sa nouvelle date.' }
         cancelled: { subject: Rendez-vous annulé, lead: Ce rendez-vous est annulé. }
         reminder: { subject: 'Rappel de rendez-vous — {date}', lead: '{hours, plural, =0 {Rappel de votre rendez-vous.} one {Rappel : votre rendez-vous est dans une heure.} other {Rappel : votre rendez-vous est dans # heures.}}' }
@@ -164,7 +164,7 @@ booking:
 calendar:
     name: Mes rendez-vous
     title: 'Rendez-vous — {office}'
-    description: 'Avec {member}. Téléphone du cabinet : {phone}.'
+    description: 'Avec {member}. Téléphone {of_the_practice} : {phone}.'
 
 space:
     appointments: Mes rendez-vous
@@ -211,7 +211,7 @@ email:
 invitation:
     title: Ouvrir mon espace
     lead: 'Bonjour {name}. Choisissez un identifiant et un mot de passe pour {email}.'
-    gone: Ce lien n’est plus valable. Demandez-en un nouveau au cabinet.
+    gone: 'Ce lien n’est plus valable. Demandez-en un nouveau {at_the_practice}.'
     username: Identifiant
     password: Mot de passe
     password_help: Dix caractères au moins.
@@ -226,7 +226,7 @@ invitation:
     email:
         subject: Ouvrez votre espace
         hello: 'Bonjour {name},'
-        body: 'Le cabinet vous a ouvert un espace en ligne : rendez-vous, documents, messages. Le lien ci-dessous est valable {days} jours.'
+        body: '{The_practice} vous a ouvert un espace en ligne : rendez-vous, documents, messages. Le lien ci-dessous est valable {days} jours.'
         button: Créer mon espace
 
 visio:
@@ -332,7 +332,7 @@ admin:
         channel: Modalité
         mode: Réservation
         bookable_by: Ouvert à
-        manual_confirmation: Confirmation par le cabinet
+        manual_confirmation: 'Confirmation par {the_practice}'
         price: Tarif affiché
         instructions: Consignes
         starts_at: Début
@@ -435,3 +435,30 @@ admin:
         waiting_since: 'en salle d’attente depuis {time}'
         waiting_none: Personne en salle d’attente.
         contact_none: Aucun message à traiter.
+
+# A first appointment asked without an account (Base\Office\Controller\Client\RequestController,
+# office.booking.public_request). {the_practice} and its forms: office.vocabulary.
+appointment_request:
+    title: Demander un rendez-vous
+    lead: 'Indiquez l’objet de votre demande ; {the_practice} vous rappelle pour convenir d’une date.'
+    notice: 'Dites en quelques mots de quoi il s’agit, <strong>sans détail confidentiel ni pièce</strong> : vos documents se déposent ensuite dans votre espace.'
+    type: Objet du rendez-vous
+    choose: Choisir…
+    member: Avec
+    no_preference: Sans préférence
+    name: Nom et prénom
+    email: Courriel
+    phone: Téléphone
+    message: Votre demande, en quelques mots
+    message_help: 'Facultatif. Conservé chiffré, lu par {the_practice} seulement.'
+    privacy: 'Vos coordonnées servent à vous recontacter pour fixer ce rendez-vous. Elles sont conservées {months} mois au plus si aucune suite n’est donnée, et ne sont transmises à personne.'
+    submit: Envoyer la demande
+    sent: 'Votre demande est enregistrée. {The_practice} vous rappelle pour convenir d’une date ; un courriel vous le confirme.'
+    none: 'La demande de rendez-vous en ligne n’est pas ouverte. Appelez {the_practice}.'
+    unavailable: 'La demande ne peut pas être enregistrée pour le moment. Appelez {the_practice}.'
+    how: Comment cela se passe
+    how_1: Vous envoyez votre demande.
+    how_2: '{The_practice} vous rappelle et fixe la date avec vous.'
+    how_3: Vous recevez la confirmation, et une invitation à ouvrir votre espace.
+    phone_instead: 'Vous préférez téléphoner :'
+    appointments: Mes rendez-vous
