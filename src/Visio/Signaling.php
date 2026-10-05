@@ -7,18 +7,21 @@ use Base\Office\Entity\Visio\Room;
 use Base\Office\Entity\Visio\Signal;
 use Base\Office\Repository\Visio\SignalRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Omnimeet\Direct\Signaling as DirectSignaling;
 
 /**
- * The WebRTC handshake relayed over plain HTTP: one side posts its offer,
- * its answer, its ICE candidates; the other asks every second, while the
- * call is being set up, for what came after the last one it read. No
- * WebSocket server to run; the media themselves never come here.
+ * The handshake under its former name and signatures (a Room, a User): the
+ * rules are omnimeet/direct's (Omnimeet\Direct\Signaling), kept here in the
+ * Signal rows.
+ *
+ * @deprecated since omnibase/office 1.1: use Omnimeet\Direct\Signaling with Rooms::participantId() and the room's reference; removed in 2.0
  */
 class Signaling
 {
-    public const MAX_PAYLOAD = 65536;
+    public const MAX_PAYLOAD = DirectSignaling::MAX_PAYLOAD;
 
     public function __construct(
+        private readonly DirectSignaling $signaling,
         private readonly SignalRepository $signals,
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -29,21 +32,13 @@ class Signaling
         if (!$room->isParticipant($sender)) {
             throw new \InvalidArgumentException('Not in this room.');
         }
-        if (!\in_array($type, Signal::TYPES, true)) {
-            throw new \InvalidArgumentException(sprintf('Unknown signal "%s".', $type));
-        }
-        if (\strlen($payload) > self::MAX_PAYLOAD || (null === json_decode($payload) && 'null' !== $payload)) {
-            throw new \InvalidArgumentException('The signal is not a JSON document of reasonable size.');
-        }
-
-        $signal = new Signal($room, $sender, $type, $payload);
-        $this->entityManager->persist($signal);
-        if ('answer' === $type) {
+        $signal = $this->signaling->send((string) $room->getReference(), Rooms::participantId($sender), $type, $payload);
+        if ($signal->connects()) {
             $room->markConnected();
+            $this->entityManager->flush();
         }
-        $this->entityManager->flush();
 
-        return $signal;
+        return $this->signals->find($signal->id);
     }
 
     /**
@@ -53,6 +48,6 @@ class Signaling
      */
     public function receive(Room $room, User $user, int $after = 0): array
     {
-        return array_map(static fn (Signal $s) => ['id' => (int) $s->getId(), 'type' => $s->getType(), 'payload' => json_decode($s->getPayload(), true)], $this->signals->findForRecipient($room, $user, $after));
+        return $this->signaling->receive((string) $room->getReference(), Rooms::participantId($user), $after);
     }
 }

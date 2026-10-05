@@ -2,17 +2,19 @@
 
 namespace Base\Office\Compliance;
 
-use Base\Office\Visio\TurnCredentials;
+use Base\Office\Visio\Gateways;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * The video's relay: configured, and answering on its first address (a UDP
- * STUN binding request - the same port coturn listens on for TURN).
+ * STUN binding request - the same port coturn listens on for TURN). It is
+ * the direct gateway's (glitchr/omnimeet, omnimeet/direct): a practice
+ * whose calls go through another gateway has no relay of its own to check.
  */
 final class TurnCheck implements ComplianceCheckInterface
 {
     public function __construct(
-        private readonly TurnCredentials $turn,
+        private readonly Gateways $gateways,
         #[Autowire('%office.visio.enabled%')] private readonly bool $enabled = true,
         #[Autowire('%office.visio.turn_probe%')] private readonly ?string $probe = null,
     ) {
@@ -20,14 +22,15 @@ final class TurnCheck implements ComplianceCheckInterface
 
     public function check(): ComplianceResult
     {
-        if (!$this->enabled) {
+        $turn = $this->enabled ? $this->gateways->turn() : null;
+        if (null === $turn) {
             return ComplianceResult::ok('compliance.turn');
         }
-        if (!$this->turn->isConfigured()) {
+        if (!$turn->isConfigured()) {
             return new ComplianceResult('compliance.turn', ComplianceResult::MISSING, 'compliance.turn_advice');
         }
 
-        $url = $this->probe ? 'turn:'.$this->probe : ($this->turn->turnUrls()[0] ?? '');
+        $url = $this->probe ? 'turn:'.$this->probe : ($turn->turnUrls()[0] ?? '');
 
         return self::reachable($url) ? ComplianceResult::ok('compliance.turn') : new ComplianceResult('compliance.turn', ComplianceResult::WARNING, 'compliance.turn_unreachable', 'office', ['url' => $url]);
     }

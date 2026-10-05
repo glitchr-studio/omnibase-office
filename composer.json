@@ -1,7 +1,7 @@
 {
     "name": "omnibase/office",
     "type": "symfony-bundle",
-    "description": "A professional practice on omnibase - the office, its team, its hours and contact (core), appointments by slot or by request (Booking), an encrypted document vault per recipient with its access log (Share), one-to-one peer-to-peer video with a waiting room (Visio). Shared by the regulated professions: health, notaries, lawyers.",
+    "description": "A professional practice on omnibase - the office, its team, its hours and contact (core), appointments by slot or by request (Booking), an encrypted document vault per recipient with its access log (Share), a video room with a waiting room, its calls carried by a glitchr/omnimeet gateway - from browser to browser by default (Visio). Shared by the regulated professions: health, notaries, lawyers.",
     "keywords": ["symfony", "omnibase", "office", "appointments", "booking", "documents", "encryption", "webrtc", "teleconsultation"],
     "homepage": "https://github.com/glitchr-studio/omnibase-office",
     "license": "LGPL-3.0-or-later",
@@ -16,7 +16,9 @@
         "ext-sodium": "*",
         "doctrine/orm": "^2.15|^3.0",
         "glitchr/omnibase": "3.0.*-dev",
+        "glitchr/omnimeet": "^1.0@dev",
         "league/flysystem": "^3.0",
+        "omnimeet/direct": "^1.0@dev",
         "symfony/config": "^6.4|^7.0|^8.0",
         "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/dependency-injection": "^6.4|^7.0|^8.0",
@@ -31,6 +33,7 @@
         "phpunit/phpunit": "^10.5|^11.0|^12.0"
     },
     "suggest": {
+        "omnimeet/jitsi": "Video calls on a Jitsi Meet instance instead of from browser to browser: several people, an embedded frame (office.visio.gateway)",
         "omnibase/admin": "The back office: the agenda per member, the CRUD screens, the dashboard widgets, the access log",
         "glitchr/omnistate": "A member read from their professional register (RPPS, later the CNB) through ProfessionalRegistryInterface",
         "omnibase/mailbox": "Messages to the office, with attachments kept in the vault"

@@ -7,15 +7,20 @@ use Base\Office\Repository\Visio\RoomRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * A one-to-one video room: the host (the member) and the guest (the
- * client), opened a little before its subject's start and closed a while
- * after its end. The guest waits in it until the host joins; the media go
- * from browser to browser (WebRTC), the room only relays their handshake.
+ * A video room: the host (the member) and the guest (the client), opened a
+ * little before its subject's start and closed a while after its end. The
+ * guest waits in it until the host joins. What carries the call is a
+ * gateway of glitchr/omnimeet - by default from browser to browser
+ * (omnimeet/direct): the room then only relays their handshake; the room
+ * keeps which gateway opened it and its reference there. Who may enter,
+ * who is there, when it ends: all of that is judged here, whatever the
+ * gateway.
  */
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 #[ORM\Table(name: 'office_visio_room')]
 #[ORM\UniqueConstraint(name: 'office_visio_room_token', columns: ['token'])]
 #[ORM\UniqueConstraint(name: 'office_visio_room_subject', columns: ['subjectKey'])]
+#[ORM\Index(name: 'office_visio_room_reference', columns: ['reference'])]
 class Room
 {
     #[ORM\Id]
@@ -64,6 +69,14 @@ class Room
     #[ORM\Column(type: 'utc_datetime_immutable')]
     protected \DateTimeImmutable $createdAt;
 
+    /** The gateway that opened it (office.visio.gateway at that moment): "direct", "jitsi"... Null: not opened on one yet. */
+    #[ORM\Column(length: 64, nullable: true)]
+    protected ?string $gateway = null;
+
+    /** Its name on that gateway: what glitchr/omnimeet's Open answered, kept to let people in and to close. */
+    #[ORM\Column(length: 255, nullable: true)]
+    protected ?string $reference = null;
+
     public function __construct(string $subjectKey, ?User $host, ?User $guest, \DateTimeInterface $opensAt, \DateTimeInterface $closesAt, ?string $token = null)
     {
         $this->subjectKey = $subjectKey;
@@ -97,6 +110,22 @@ class Room
     public function getConnectedAt(): ?\DateTimeImmutable { return $this->connectedAt; }
     public function getEndedAt(): ?\DateTimeImmutable { return $this->endedAt; }
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
+    public function getGateway(): ?string { return $this->gateway; }
+    public function getReference(): ?string { return $this->reference; }
+
+    /** Opened on a gateway: its name, and the room's reference there. */
+    public function openedOn(string $gateway, string $reference): self
+    {
+        $this->gateway = $gateway;
+        $this->reference = $reference;
+
+        return $this;
+    }
+
+    public function isOpenedOnGateway(): bool
+    {
+        return null !== $this->gateway && null !== $this->reference;
+    }
 
     public function isHost(?User $user): bool
     {

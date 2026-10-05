@@ -237,6 +237,13 @@ visio:
     ended: La consultation est terminée.
     early: 'La salle ouvre à {time}. Revenez à ce moment-là.'
     closed: Cette salle est fermée.
+    unavailable: La visio est momentanément indisponible. Réessayez dans un instant ou appelez {the_practice}.
+    provider:
+        notice: 'Cette consultation passe par {host}, un service extérieur à ce site : l’image et le son y transitent. Rien n’y est chargé avant votre entrée.'
+        consent: Autoriser la visio
+        consent_label: Visio
+        consent_description: 'La consultation en visio passe par {host}, un service extérieur à ce site.'
+        go: 'Ouvrir la visio sur {host}'
     noscript: La visio a besoin de JavaScript.
     remote: Image de votre interlocuteur
     local: Votre image
@@ -266,6 +273,8 @@ visio:
         connecting: Connexion…
         connected: En ligne.
         lost: Connexion interrompue, nouvelle tentative…
+        provider_ready: Tout est prêt. Entrez quand vous voulez.
+        consent_needed: Autorisez la visio pour entrer — elle passe par un service extérieur à ce site.
 
 compliance:
     failed: 'Vérification impossible : {error}'

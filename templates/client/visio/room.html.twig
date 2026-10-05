@@ -1,23 +1,45 @@
 {#
  # The video room (Base\Office\Controller\Client\VisioController::room): the
- # camera check, the waiting room, the call. public/js/visio.js does the
- # rest - RTCPeerConnection, the handshake over HTTP, the chat on a data
- # channel. Without scripts, or before the room opens, the page says when.
+ # camera check, the waiting room, the call. What carries the call is the
+ # room's gateway (glitchr/omnimeet); `access` is how it lets this
+ # participant in, and the page renders it:
+ #
+ #   engine  the gateway's own script on this markup - omnimeet/direct:
+ #           RTCPeerConnection, the handshake over HTTP, the chat on a data
+ #           channel, from browser to browser;
+ #   frame   a provider's interface in a frame, driven by the gateway's
+ #           script when it has one (bundles/office/js/visio-frame.js keeps
+ #           the waiting room, the presence and the end the same);
+ #   link    a button to the provider's address.
+ #
+ # A third party is named before anything is loaded from it, and waits for
+ # the visitor's consent (omnibase/consent, when the site has it). Without
+ # scripts, or before the room opens, the page says when.
  #}
 {% extends office_layout() %}
 
 {% block title %}{{ 'visio.title'|trans({}, 'office') }}{% endblock %}
 
 {% block content %}
-<section class="of-page of-visio"
-    {% if open %}
+{% set kind = open and access ? access.kind.value : null %}
+{% set endpoints %}
     data-office-visio
     data-role="{{ is_host ? 'host' : 'guest' }}"
-    data-ice-url="{{ path('office_visio_ice', {token: room.token}) }}"
     data-signal-url="{{ path('office_visio_signal_send', {token: room.token}) }}"
     data-end-url="{{ path('office_visio_end', {token: room.token}) }}"
-    data-document-url="{{ path('office_visio_document', {token: room.token}) }}"
     data-csrf="{{ csrf_token('office_visio_' ~ room.token) }}"
+{% endset %}
+<section class="of-page of-visio{{ kind in ['frame', 'link'] ? ' of-visio-provider' }}"
+    {% if kind == 'engine' %}
+    data-omnimeet-{{ access.engine }}
+    {{ endpoints }}
+    data-ice-url="{{ path('office_visio_ice', {token: room.token}) }}"
+    data-document-url="{{ path('office_visio_document', {token: room.token}) }}"
+    data-sr-class="of-sr"
+    {% elseif kind in ['frame', 'link'] %}
+    data-office-visio-frame
+    {{ endpoints }}
+    {% if access.thirdParty %}data-consent="VISIO"{% endif %}
     {% endif %}>
     <header class="of-page-head">
         <h1>{{ 'visio.title'|trans({}, 'office') }}</h1>
@@ -30,11 +52,30 @@
     <p class="of-notice" role="status">{{ 'visio.ended'|trans({}, 'office') }}</p>
     {% elseif early %}
     <p class="of-notice" role="status">{{ 'visio.early'|trans({time: room.opensAt|format_datetime('none', 'short', locale=app.request.locale, timezone=office_timezone())}, 'office') }}</p>
+    {% elseif unavailable|default(false) %}
+    <p class="of-warning" role="alert">{{ 'visio.unavailable'|trans({}, 'office') }}</p>
     {% elseif not open %}
     <p class="of-notice" role="status">{{ 'visio.closed'|trans({}, 'office') }}</p>
     {% else %}
     <noscript><p class="of-warning">{{ 'visio.noscript'|trans({}, 'office') }}</p></noscript>
 
+    {% set texts = {
+        check: 'visio.status.check'|trans({}, 'office'),
+        ready: 'visio.status.ready'|trans({}, 'office'),
+        denied: 'visio.status.denied'|trans({}, 'office'),
+        waiting_host: 'visio.status.waiting_host'|trans({}, 'office'),
+        waiting_guest: 'visio.status.waiting_guest'|trans({}, 'office'),
+        guest_here: 'visio.status.guest_here'|trans({}, 'office'),
+        connecting: 'visio.status.connecting'|trans({}, 'office'),
+        connected: 'visio.status.connected'|trans({}, 'office'),
+        lost: 'visio.status.lost'|trans({}, 'office'),
+        ended: 'visio.ended'|trans({}, 'office'),
+        file_sent: 'visio.file_sent'|trans({}, 'office'),
+        file_received: 'visio.file_received'|trans({}, 'office'),
+        you: 'visio.you'|trans({}, 'office')
+    } %}
+
+    {% if kind == 'engine' %}
     <p class="of-visio-status" data-visio-status role="status" aria-live="polite">{{ 'visio.status.check'|trans({}, 'office') }}</p>
 
     <div class="of-visio-stage">
@@ -62,22 +103,47 @@
         <p class="of-help">{{ 'visio.chat_help'|trans({}, 'office') }}</p>
     </section>
 
-    <script type="application/json" data-visio-texts>{{ {
-        check: 'visio.status.check'|trans({}, 'office'),
-        ready: 'visio.status.ready'|trans({}, 'office'),
-        denied: 'visio.status.denied'|trans({}, 'office'),
-        waiting_host: 'visio.status.waiting_host'|trans({}, 'office'),
-        waiting_guest: 'visio.status.waiting_guest'|trans({}, 'office'),
-        guest_here: 'visio.status.guest_here'|trans({}, 'office'),
-        connecting: 'visio.status.connecting'|trans({}, 'office'),
-        connected: 'visio.status.connected'|trans({}, 'office'),
-        lost: 'visio.status.lost'|trans({}, 'office'),
-        ended: 'visio.ended'|trans({}, 'office'),
-        file_sent: 'visio.file_sent'|trans({}, 'office'),
-        file_received: 'visio.file_received'|trans({}, 'office'),
-        you: 'visio.you'|trans({}, 'office')
-    }|json_encode|raw }}</script>
-    <script src="{{ asset('bundles/office/js/visio.js') }}" defer></script>
+    <script type="application/json" data-visio-texts>{{ texts|json_encode|raw }}</script>
+    <script src="{{ path('office_visio_engine', {token: room.token}) }}" defer></script>
+    {% else %}
+    {# A provider's frame or address: named before anything is asked of it. #}
+    {% if access.thirdParty %}
+    <p class="of-notice of-visio-third-party">
+        {{ 'visio.provider.notice'|trans({host: third_parties|join(', ')}, 'office') }}
+        <button type="button" class="of-button of-button-small of-button-quiet" data-visio-consent data-consent-open hidden>{{ 'visio.provider.consent'|trans({}, 'office') }}</button>
+    </p>
+    {% endif %}
+
+    <p class="of-visio-status" data-visio-status role="status" aria-live="polite">{{ 'visio.status.provider_ready'|trans({}, 'office') }}</p>
+
+    <div class="of-visio-stage of-visio-frame" data-visio-stage hidden>
+        {% if kind == 'frame' and access.engine %}
+        {# The gateway's script drives the frame: it boots on its own root, and puts the frame in [data-omnimeet-frame]. #}
+        <div class="of-visio-pilot" data-visio-pilot data-omnimeet-{{ access.engine }} data-options="{{ access.options|json_encode }}"><div class="of-visio-pilot-frame" data-omnimeet-frame></div></div>
+        {% elseif kind == 'frame' %}
+        <iframe class="of-visio-pilot-frame" data-visio-iframe data-src="{{ access.url }}" allow="{{ access.allow }}" title="{{ 'visio.title'|trans({}, 'office') }}"></iframe>
+        {% endif %}
+    </div>
+
+    <div class="of-visio-controls" role="toolbar" aria-label="{{ 'visio.controls'|trans({}, 'office') }}">
+        <button type="button" class="of-button" data-visio-join>{{ (is_host ? 'visio.start' : 'visio.enter')|trans({}, 'office') }}</button>
+        {% if kind == 'link' %}
+        <a class="of-button" data-visio-link href="{{ access.url }}" target="_blank" rel="noopener noreferrer" hidden>{{ 'visio.provider.go'|trans({host: third_parties|join(', ')}, 'office') }}</a>
+        {% endif %}
+        <button type="button" class="of-button of-button-danger" data-visio-hangup hidden>{{ (is_host ? 'visio.end' : 'visio.leave')|trans({}, 'office') }}</button>
+    </div>
+
+    <script type="application/json" data-visio-texts>{{ texts|merge({
+        provider_ready: 'visio.status.provider_ready'|trans({}, 'office'),
+        consent_needed: 'visio.status.consent_needed'|trans({}, 'office'),
+        consent_label: 'visio.provider.consent_label'|trans({}, 'office'),
+        consent_description: 'visio.provider.consent_description'|trans({host: third_parties|join(', ')}, 'office')
+    })|json_encode|raw }}</script>
+    {% if kind == 'frame' and access.engine %}
+    <script src="{{ path('office_visio_engine', {token: room.token}) }}" defer></script>
+    {% endif %}
+    <script src="{{ asset('bundles/office/js/visio-frame.js') }}" defer></script>
+    {% endif %}
     {% endif %}
 </section>
 {% endblock %}

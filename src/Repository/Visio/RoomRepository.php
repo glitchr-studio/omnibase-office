@@ -24,6 +24,12 @@ class RoomRepository extends ServiceEntityRepository
         return $this->findOneBy(['subjectKey' => $key]);
     }
 
+    /** The room a gateway knows by that name (glitchr/omnimeet's reference), on that gateway when it is given. */
+    public function findOneByReference(string $reference, ?string $gateway = null): ?Room
+    {
+        return $this->findOneBy(['reference' => $reference] + (null !== $gateway ? ['gateway' => $gateway] : []));
+    }
+
     /** @return list<Room> rooms open now whose guest waits for the host */
     public function findWaiting(int $seconds = 20): array
     {
