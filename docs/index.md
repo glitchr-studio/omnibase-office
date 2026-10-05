@@ -125,4 +125,4 @@ CRUD screens for every entity; `/admin/agenda` (see [Booking](booking.md)); `/ad
 
 ## More
 
-[Booking](booking.md) · [Share](share.md) · [Visio](visio.md)
+[Booking](booking.md) · [Share](share.md) · [Visio](visio.md) · [What a regime builds on](regimes.md)
