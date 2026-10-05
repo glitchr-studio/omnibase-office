@@ -19,8 +19,8 @@ class AbsenceRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.member = :member')->setParameter('member', $member)
-            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Office\Database\Utc::of($to))
-            ->andWhere('a.endsAt > :from')->setParameter('from', \Base\Office\Database\Utc::of($from))
+            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Database\Type\Utc::from($to))
+            ->andWhere('a.endsAt > :from')->setParameter('from', \Base\Database\Type\Utc::from($from))
             ->getQuery()->getResult();
     }
 

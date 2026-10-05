@@ -27,7 +27,7 @@ class RoomRepository extends ServiceEntityRepository
     /** @return list<Room> rooms open now whose guest waits for the host */
     public function findWaiting(int $seconds = 20): array
     {
-        $now = \Base\Office\Database\Utc::now();
+        $now = \Base\Database\Type\Utc::now();
 
         return array_values(array_filter(
             $this->createQueryBuilder('r')
@@ -43,7 +43,7 @@ class RoomRepository extends ServiceEntityRepository
     public function findClosedBefore(\DateTimeInterface $before): array
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.closesAt < :before OR r.endedAt IS NOT NULL')->setParameter('before', \Base\Office\Database\Utc::of($before))
+            ->andWhere('r.closesAt < :before OR r.endedAt IS NOT NULL')->setParameter('before', \Base\Database\Type\Utc::from($before))
             ->getQuery()->getResult();
     }
 

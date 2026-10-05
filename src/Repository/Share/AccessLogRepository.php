@@ -36,7 +36,7 @@ class AccessLogRepository extends ServiceEntityRepository
 
     public function purgeBefore(\DateTimeInterface $before): int
     {
-        return $this->createQueryBuilder('l')->delete()->andWhere('l.createdAt < :before')->setParameter('before', \Base\Office\Database\Utc::of($before))->getQuery()->execute();
+        return $this->createQueryBuilder('l')->delete()->andWhere('l.createdAt < :before')->setParameter('before', \Base\Database\Type\Utc::from($before))->getQuery()->execute();
     }
 
 }

@@ -27,7 +27,7 @@ class ContactRequestRepository extends ServiceEntityRepository
 
     public function purgeBefore(\DateTimeInterface $before): int
     {
-        return $this->createQueryBuilder('c')->delete()->andWhere('c.createdAt < :before')->setParameter('before', \Base\Office\Database\Utc::of($before))->getQuery()->execute();
+        return $this->createQueryBuilder('c')->delete()->andWhere('c.createdAt < :before')->setParameter('before', \Base\Database\Type\Utc::from($before))->getQuery()->execute();
     }
 
 }

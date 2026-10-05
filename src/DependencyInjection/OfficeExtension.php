@@ -16,13 +16,12 @@ class OfficeExtension extends AbstractBaseExtension implements PrependExtensionI
         return new OfficeConfiguration();
     }
 
-    /** The UTC moment type, and the private storage of the vault when the application has not declared it. */
+    /**
+     * The private storage of the vault when the application has not declared it. (The UTC moment type the
+     * entities use, utc_datetime_immutable, is glitchr/omnibase's: Base\Database\Type\UtcDateTimeImmutableType.)
+     */
     public function prepend(ContainerBuilder $container): void
     {
-        // Moments in UTC, whatever timezone PHP was put in for the visitor (Base\Office\Database\UtcDateTimeImmutableType).
-        if ($container->hasExtension('doctrine')) {
-            $container->prependExtensionConfig('doctrine', ['dbal' => ['types' => [\Base\Office\Database\UtcDateTimeImmutableType::NAME => \Base\Office\Database\UtcDateTimeImmutableType::class]]]);
-        }
         if (!$container->hasExtension('flysystem')) {
             return;
         }

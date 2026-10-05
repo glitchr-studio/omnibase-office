@@ -27,8 +27,11 @@ office_admin_controller:            # the agenda, the documents, the access log 
 ```
 
 Then a migration (`doctrine:migrations:diff`): 14 tables, all prefixed `office_` (and `office`).
-Moments are stored in UTC through the bundle's own `utc_datetime_immutable` type, registered by the
-bundle: omnibase sets PHP's timezone per visitor, and an appointment must not move with it.
+Moments are stored in UTC through glitchr/omnibase's `utc_datetime_immutable` type
+(`Base\Database\Type\UtcDateTimeImmutableType`, registered by omnibase): omnibase sets PHP's
+timezone per visitor, and an appointment must not move with it. In a query, a moment is bound as
+`Base\Database\Type\Utc::from($moment)`. (The bundle had its own type of the same name and its own
+`Base\Office\Database\Utc` until omnibase provided them: same name, same column, no migration.)
 
 The master key of the vault, once, in the secrets vault:
 

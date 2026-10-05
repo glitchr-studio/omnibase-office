@@ -22,8 +22,8 @@ class AppointmentRepository extends ServiceEntityRepository
             ->andWhere('a.member = :member')->setParameter('member', $member)
             ->andWhere('a.status IN (:active)')->setParameter('active', [AppointmentStatus::REQUESTED->value, AppointmentStatus::CONFIRMED->value])
             ->andWhere('a.startsAt IS NOT NULL')
-            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Office\Database\Utc::of($to))
-            ->andWhere('a.endsAt > :from')->setParameter('from', \Base\Office\Database\Utc::of($from))
+            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Database\Type\Utc::from($to))
+            ->andWhere('a.endsAt > :from')->setParameter('from', \Base\Database\Type\Utc::from($from))
             ->orderBy('a.startsAt', 'ASC')
             ->getQuery()->getResult();
     }
@@ -33,8 +33,8 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('a')
             ->addSelect('m', 't')->innerJoin('a.member', 'm')->innerJoin('a.type', 't')
-            ->andWhere('a.startsAt >= :from')->setParameter('from', \Base\Office\Database\Utc::of($from))
-            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Office\Database\Utc::of($to))
+            ->andWhere('a.startsAt >= :from')->setParameter('from', \Base\Database\Type\Utc::from($from))
+            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Database\Type\Utc::from($to))
             ->orderBy('a.startsAt', 'ASC');
         if ($member) {
             $qb->andWhere('a.member = :member')->setParameter('member', $member);
@@ -49,7 +49,7 @@ class AppointmentRepository extends ServiceEntityRepository
     /** @return list<Appointment> the client's appointments, upcoming first then the past */
     public function findForClient(object $client, bool $upcoming = true, int $limit = 50): array
     {
-        $now = \Base\Office\Database\Utc::now();
+        $now = \Base\Database\Type\Utc::now();
         $qb = $this->createQueryBuilder('a')
             ->andWhere('a.client = :client')->setParameter('client', $client)
             ->setMaxResults($limit);
@@ -87,8 +87,8 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.status = :confirmed')->setParameter('confirmed', AppointmentStatus::CONFIRMED->value)
-            ->andWhere('a.startsAt >= :from')->setParameter('from', \Base\Office\Database\Utc::of($from))
-            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Office\Database\Utc::of($to))
+            ->andWhere('a.startsAt >= :from')->setParameter('from', \Base\Database\Type\Utc::from($from))
+            ->andWhere('a.startsAt < :to')->setParameter('to', \Base\Database\Type\Utc::from($to))
             ->getQuery()->getResult();
     }
 
@@ -97,7 +97,7 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.status = :confirmed')->setParameter('confirmed', AppointmentStatus::CONFIRMED->value)
-            ->andWhere('a.endsAt < :before')->setParameter('before', \Base\Office\Database\Utc::of($before))
+            ->andWhere('a.endsAt < :before')->setParameter('before', \Base\Database\Type\Utc::from($before))
             ->getQuery()->getResult();
     }
 
@@ -120,7 +120,7 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('a')->delete()
             ->andWhere('(a.endsAt < :before OR (a.endsAt IS NULL AND a.createdAt < :before))')
-            ->setParameter('before', \Base\Office\Database\Utc::of($before))
+            ->setParameter('before', \Base\Database\Type\Utc::from($before))
             ->getQuery()->execute();
     }
 

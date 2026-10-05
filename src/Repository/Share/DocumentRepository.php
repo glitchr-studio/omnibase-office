@@ -45,7 +45,7 @@ class DocumentRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('d')
             ->andWhere('(d.expiresAt IS NOT NULL AND d.expiresAt < :before) OR (d.revokedAt IS NOT NULL AND d.revokedAt < :before)')
-            ->setParameter('before', \Base\Office\Database\Utc::of($before))
+            ->setParameter('before', \Base\Database\Type\Utc::from($before))
             ->getQuery()->getResult();
     }
 
