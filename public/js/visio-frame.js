@@ -33,7 +33,7 @@
         var pilot = $('pilot'), iframe = $('iframe'), link = $('link'), consentBtn = $('consent');
 
         var joined = false, entered = false, over = false, timer = null;
-        var feature = root.dataset.consent || '', allowed = !feature;
+        var feature = root.dataset.consent || '', allowed = !feature, wired = false;
 
         function status(key) {
             root.dataset.visioState = key;
@@ -90,6 +90,9 @@
 
         function join() {
             if (joined || over) return;
+            wire();
+            // No consent panel on this site: entering, after the notice above, is the visitor's yes.
+            if (feature && !wired) allowed = true;
             if (!allowed) { status('consent_needed'); show(consentBtn, true); return; }
             joined = true;
             show(joinBtn, false);
@@ -120,16 +123,30 @@
         });
         window.addEventListener('pagehide', function () { if (entered) leave(false); });
 
-        // A third party: omnibase/consent's panel decides, when the site has it; this page's own "enter" otherwise.
-        if (feature && window.Consent && typeof window.Consent.use === 'function') {
+        // A third party: omnibase/consent's panel decides, when the site has it (its script may load after this
+        // one: asked again when the page is ready, and when the visitor enters); this page's own "enter" otherwise.
+        function wire() {
+            if (wired || !feature) return;
+            if (!window.Consent || typeof window.Consent.use !== 'function') return;
+            wired = true;
             allowed = !!window.Consent.use(feature, { label: texts.consent_label, description: texts.consent_description },
                 function () { allowed = true; show(consentBtn, false); if (root.dataset.visioState === 'consent_needed') status('provider_ready'); },
-                function () { allowed = false; if (entered && !over) { leave(false); joined = false; clearTimeout(timer); show(joinBtn, true); show(hangBtn, false); } status('consent_needed'); show(consentBtn, true); });
-            if (!allowed) { status('consent_needed'); show(consentBtn, true); }
-        } else {
-            allowed = true;
+                function () {
+                    allowed = false;
+                    if (over) return;
+                    if (entered) leave(false);
+                    joined = false;
+                    clearTimeout(timer);
+                    show(joinBtn, true);
+                    show(hangBtn, false);
+                    status('consent_needed');
+                    show(consentBtn, true);
+                });
+            if (!allowed && !over) { status('consent_needed'); show(consentBtn, true); }
         }
-        if (allowed) status('provider_ready');
+        wire();
+        document.addEventListener('DOMContentLoaded', wire);
+        window.addEventListener('load', wire);
 
         // A room closed while the page sat open says so, joined or not.
         (function watch() { if (over) return; if (!joined) request('GET', root.dataset.signalUrl + '?after=0').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d && (d.ended || !d.open)) finish(false); }).catch(function () {}); setTimeout(watch, 15000); })();
