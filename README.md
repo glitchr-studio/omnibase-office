@@ -8,7 +8,7 @@ lawyer's office - on [glitchr/omnibase](https://github.com/glitchr-studio/omniba
 | **Core** | The office (`Office`: address, access, accessibility), the team (`Member`, read again from their professional register), the walk-in hours, the contact form, the compliance checks. The opening hours are omnibase's. |
 | **Booking** | Appointment types, weekly schedules, absences, service areas; free slots (`SlotFinder`), bookings taken under a lock (`Booker`), requests without a time, series; e-mails with the `.ics`; the agenda in the back office. |
 | **Share** | A document vault per recipient: files encrypted with libsodium (a key per file, wrapped by a master key), fail closed without a key; who may read decided by a voter a regime extends; every access logged. |
-| **Visio** | One-to-one video, browser to browser (WebRTC), with a waiting room: the handshake relayed over HTTP, temporary TURN credentials for your own coturn. Nothing through a third party. |
+| **Visio** | A video room per appointment, with a waiting room. The call is carried by a gateway of [glitchr/omnimeet](https://github.com/glitchr-studio/omnimeet): by default from browser to browser (`omnimeet/direct`: WebRTC, the handshake relayed over HTTP, temporary TURN credentials for your own coturn, nothing through a third party); a Jitsi instance or another provider by configuration. Who enters, who waits and when it ends stay the room's. |
 
 Nothing here knows health, law or payment. A regime puts its trade on top: `omnibase/health` does.
 

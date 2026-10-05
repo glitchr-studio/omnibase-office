@@ -11,9 +11,13 @@ order: 1
 composer require omnibase/office
 ```
 
+It brings [`glitchr/omnimeet`](https://github.com/glitchr-studio/omnimeet) and `omnimeet/direct`,
+which carry the video calls ([Visio](visio.md)).
+
 ```php
 // config/bundles.php
 Base\Office\OfficeBundle::class => ['all' => true],
+Omnimeet\Bridge\Symfony\OmnimeetBundle::class => ['all' => true],   // the video gateways; optional for the direct one alone
 ```
 
 ```yaml
@@ -77,12 +81,25 @@ office:
     visio:
         open_before: 10                    # minutes before the appointment the room opens
         close_after: 30
-        turn_secret: '%env(default::TURN_SECRET)%'
-        turn_urls: '%env(default::TURN_URLS)%'   # a list, or one comma-separated variable
-        stun_urls: []                      # none by default: no third party is asked where the browser is
-        turn_ttl: 3600
+        gateway: direct                    # the glitchr/omnimeet gateway new rooms open on (omnimeet.gateways.<name>)
+        names: host                        # whose name a gateway is given: the member's (host), or none
         turn_probe: ~                      # host:port the compliance check asks (a container's service name)
+
+# config/packages/omnimeet.yaml - the direct gateway's relay (it is declared for you, without one)
+omnimeet:
+    gateways:
+        direct:
+            factory: direct
+            options:
+                turn_secret: '%env(default::TURN_SECRET)%'
+                turn_urls: '%env(default::TURN_URLS)%'   # a list, or one comma-separated variable
+                stun_urls: []              # none by default: no third party is asked where the browser is
+                turn_ttl: 3600
 ```
+
+`office.visio.turn_secret`, `turn_urls`, `stun_urls` and `turn_ttl`, where these four were
+written before the video's engine left for glitchr/omnimeet, are still read - as aliases, for
+this version, with a deprecation notice.
 
 ## Pages
 
@@ -144,8 +161,8 @@ attaches the appointments taken for that address before the account existed, and
 
 `ComplianceCheckInterface` services (autoconfigured, tag `office.compliance_check`) answer a
 `ComplianceResult` (ok, warning, missing, and what to do). The dashboard widget `office_compliance`
-lists them. The office's own: the vault's key, the TURN relay (configured, and answering a STUN
-request), the legal notice's host. A regime adds its trade's.
+lists them. The office's own: the vault's key, the direct video gateway's TURN relay (configured,
+and answering a STUN request), the legal notice's host. A regime adds its trade's.
 
 ## Back office (with omnibase/admin)
 
