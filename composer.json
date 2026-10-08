@@ -4,7 +4,7 @@
     "description": "A professional practice on omnibase - the office, its team, its hours and contact (core), appointments by slot or by request (Booking), an encrypted document vault per recipient with its access log (Share), a video room with a waiting room, its calls carried by a glitchr/omnimeet gateway - from browser to browser by default (Visio). Shared by the regulated professions: health, notaries, lawyers.",
     "keywords": ["symfony", "omnibase", "office", "appointments", "booking", "documents", "encryption", "webrtc", "teleconsultation"],
     "homepage": "https://github.com/glitchr-studio/omnibase-office",
-    "license": "LGPL-3.0-or-later",
+    "license": "MIT",
     "authors": [
         {
             "name": "Marco Meyer",

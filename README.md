@@ -16,4 +16,4 @@ Nothing here knows health, law or payment. A regime puts its trade on top: `omni
 composer require omnibase/office
 ```
 
-Documentation: [docs/](docs/index.md). License: LGPL-3.0-or-later.
+Documentation: [docs/](docs/index.md). License: MIT since 2026-10-09; earlier versions remain published under LGPL-3.0-or-later.
