@@ -22,7 +22,7 @@
                 {{ form_row(form.message, {label: 'contact.message'|trans({}, 'office')}) }}
                 {{ form_row(form.website) }}
                 {{ form_row(form.privacy) }}
-                {#- The guard's captcha (glitchr/omniguard), when the site has one: before the button, not
+                {#- The guard's captcha (glitchr/omnishield), when the site has one: before the button, not
                     left by form_end under it. -#}
                 {% if form.guard_captcha is defined %}{{ form_row(form.guard_captcha) }}{% endif %}
                 <button type="submit" class="of-button">{{ 'contact.submit'|trans({}, 'office') }}</button>
